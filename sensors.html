@@ -1,0 +1,61 @@
+<!doctype html>
+<html lang="zh-Hant">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="description" content="ESP32 感應器索引：環境、距離、光線、動作、姿態與通訊感測器，依學習難度分類。" />
+    <title>ESP32 感應器索引｜ESP32 實作學習站</title>
+    <link rel="icon" type="image/svg+xml" href="./favicon.svg" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;500;600;700;800&family=Space+Grotesk:wght@500;600;700&display=swap" rel="stylesheet" />
+    <link rel="stylesheet" href="./styles.css" />
+  </head>
+  <body>
+    <div class="site-shell">
+      <header class="topbar">
+        <a class="brand" href="./index.html" aria-label="回到首頁"><span class="brand-mark" aria-hidden="true"><span></span><span></span><span></span></span><span><strong>ESP32</strong><small>實作學習站</small></span></a>
+        <nav class="main-nav" aria-label="主要導覽">
+          <a href="./index.html#map">學習地圖</a><a href="./modules.html">模組</a><a class="active" href="./sensors.html">感應器</a><a href="./code.html">程式基礎</a>
+        </nav>
+        <button class="menu-button" type="button" aria-label="開啟導覽選單" aria-expanded="false">選單</button>
+      </header>
+
+      <main class="inner-page">
+        <section class="page-hero page-hero-sensor section-pad">
+          <div><p class="eyebrow"><span class="eyebrow-dot"></span>感應器索引 / 輸入與資料</p><h1>讓 ESP32<br /><em>讀懂周圍的世界。</em></h1><p class="hero-text">依照資料類型整理常見感應器：從按鈕、光線、溫濕度開始，再進入姿態、聲音、RFID 與 GPS。</p></div>
+          <div class="page-hero-mark"><span class="mark-line"></span><strong>INPUT<br />/ SENSORS</strong><small>LIGHT · AIR · MOTION · DATA</small></div>
+        </section>
+
+        <section class="catalog-toolbar section-pad">
+          <div><p class="eyebrow">01 / 依程度瀏覽</p><h2>先讀取，再思考怎麼應用</h2></div>
+          <div class="filter-group" role="group" aria-label="感應器難度篩選"><button class="level-filter is-active" data-level="all" type="button">全部 <span>17</span></button><button class="level-filter" data-level="beginner" type="button">簡單 <span>5</span></button><button class="level-filter" data-level="intermediate" type="button">中等 <span>6</span></button><button class="level-filter" data-level="advanced" type="button">困難 <span>6</span></button></div>
+        </section>
+
+        <section class="catalog-grid section-pad" aria-label="ESP32 感應器清單">
+          <article class="catalog-card" data-level="beginner"><div class="catalog-top"><span>S01 · 簡單</span><b>GPIO</b></div><h3>按鈕／微動開關</h3><p>最基本的數位輸入，學習按下、放開與防彈跳。</p><dl><div><dt>常見接線</dt><dd>GPIO27→按鈕→GND，使用 INPUT_PULLUP</dd></div><div><dt>函式庫</dt><dd>不需外部函式庫</dd></div><div><dt>可做應用</dt><dd>啟動鍵、模式切換</dd></div></dl></article>
+          <article class="catalog-card" data-level="beginner"><div class="catalog-top"><span>S02 · 簡單</span><b>ADC</b></div><h3>可變電阻</h3><p>把旋鈕位置轉成類比數值，認識 ADC 讀值。</p><dl><div><dt>常見接線</dt><dd>兩端接 3V3／GND，中間腳→GPIO34</dd></div><div><dt>函式庫</dt><dd>不需外部函式庫</dd></div><div><dt>可做應用</dt><dd>亮度旋鈕、音量控制</dd></div></dl></article>
+          <article class="catalog-card" data-level="beginner"><div class="catalog-top"><span>S03 · 簡單</span><b>ADC</b></div><h3>光敏電阻 LDR</h3><p>用分壓電路測量明暗，建立環境感測的第一步。</p><dl><div><dt>常見接線</dt><dd>LDR＋10kΩ 分壓，中點→GPIO34</dd></div><div><dt>函式庫</dt><dd>不需外部函式庫</dd></div><div><dt>可做應用</dt><dd>自動夜燈、亮度告警</dd></div></dl></article>
+          <article class="catalog-card" data-level="beginner"><div class="catalog-top"><span>S04 · 簡單</span><b>GPIO</b></div><h3>PIR 人體紅外線</h3><p>偵測移動事件，練習數位訊號與觸發動作。</p><dl><div><dt>常見接線</dt><dd>OUT→GPIO27、VCC／GND 依模組</dd></div><div><dt>函式庫</dt><dd>不需外部函式庫</dd></div><div><dt>可做應用</dt><dd>自動燈、入侵提醒</dd></div></dl></article>
+          <article class="catalog-card" data-level="beginner"><div class="catalog-top"><span>S05 · 簡單</span><b>1-WIRE</b></div><h3><a class="catalog-card-link" href="./sensor-pages/dht11.html">DHT11 溫濕度</a></h3><p>讀取最常見的環境資料，適合搭配序列埠與 OLED。</p><dl><div><dt>常見接線</dt><dd>DATA→GPIO4、VCC→3V3、GND</dd></div><div><dt>函式庫</dt><dd>DHT sensor library、Adafruit Unified Sensor</dd></div><div><dt>可做應用</dt><dd>教室環境監測</dd></div></dl></article>
+          <article class="catalog-card" data-level="intermediate"><div class="catalog-top"><span>S06 · 中等</span><b>TIME</b></div><h3>HC-SR04 超音波</h3><p>由 Trig 發送、Echo 接收回波，計算物體距離。</p><dl><div><dt>常見接線</dt><dd>Trig→GPIO5；Echo→GPIO18 需降壓</dd></div><div><dt>函式庫</dt><dd>不需外部函式庫或 NewPing</dd></div><div><dt>可做應用</dt><dd>倒車雷達、避障車</dd></div></dl></article>
+          <article class="catalog-card" data-level="intermediate"><div class="catalog-top"><span>S07 · 中等</span><b>1-WIRE</b></div><h3>DS18B20 防水溫度</h3><p>用單線匯流排連接一顆或多顆溫度探頭。</p><dl><div><dt>常見接線</dt><dd>DATA→GPIO4，DATA 與 3V3 間加 4.7kΩ</dd></div><div><dt>函式庫</dt><dd>OneWire、DallasTemperature</dd></div><div><dt>可做應用</dt><dd>水溫、土壤溫度</dd></div></dl></article>
+          <article class="catalog-card" data-level="intermediate"><div class="catalog-top"><span>S08 · 中等</span><b>ADC</b></div><h3>土壤濕度</h3><p>讀取介質濕度，並注意電極腐蝕與供電電壓。</p><dl><div><dt>常見接線</dt><dd>AO→GPIO34、VCC／GND；不要直接輸入 5V</dd></div><div><dt>函式庫</dt><dd>不需外部函式庫</dd></div><div><dt>可做應用</dt><dd>自動澆水、盆栽監控</dd></div></dl></article>
+          <article class="catalog-card" data-level="intermediate"><div class="catalog-top"><span>S09 · 中等</span><b>ADC</b></div><h3>MQ-2 瓦斯／煙霧</h3><p>以類比值觀察氣體濃度變化，先做相對量測。</p><dl><div><dt>常見接線</dt><dd>AO→ADC，模組輸出超過 3.3V 時需分壓</dd></div><div><dt>函式庫</dt><dd>不需外部函式庫</dd></div><div><dt>可做應用</dt><dd>環境警示、煙霧變化</dd></div></dl></article>
+          <article class="catalog-card" data-level="intermediate"><div class="catalog-top"><span>S10 · 中等</span><b>I2C</b></div><h3>MPU6050 姿態</h3><p>讀取加速度與陀螺儀，開始理解角度和動態資料。</p><dl><div><dt>常見接線</dt><dd>SDA→21、SCL→22、VCC→3V3、GND</dd></div><div><dt>函式庫</dt><dd>Wire、Adafruit MPU6050</dd></div><div><dt>可做應用</dt><dd>搖桿、計步、姿態控制</dd></div></dl></article>
+          <article class="catalog-card" data-level="intermediate"><div class="catalog-top"><span>S11 · 中等</span><b>I2C</b></div><h3>BME280 氣壓環境</h3><p>同時量測溫度、濕度與氣壓，適合製作環境儀表。</p><dl><div><dt>常見接線</dt><dd>SDA→21、SCL→22；I2C 位址依模組</dd></div><div><dt>函式庫</dt><dd>Adafruit BME280、Wire</dd></div><div><dt>可做應用</dt><dd>氣象站、樓層高度估算</dd></div></dl></article>
+          <article class="catalog-card" data-level="advanced"><div class="catalog-top"><span>S12 · 困難</span><b>I2C</b></div><h3>BH1750 光照度</h3><p>用標準單位 lux 讀取環境亮度，適合自動調光。</p><dl><div><dt>常見接線</dt><dd>SDA→21、SCL→22、VCC→3V3、GND</dd></div><div><dt>函式庫</dt><dd>BH1750</dd></div><div><dt>可做應用</dt><dd>智慧照明、植物燈</dd></div></dl></article>
+          <article class="catalog-card" data-level="advanced"><div class="catalog-top"><span>S13 · 困難</span><b>SPI</b></div><h3>RC522 RFID</h3><p>讀取卡片 UID，練習 SPI 腳位與門禁邏輯。</p><dl><div><dt>常見接線</dt><dd>SCK18、MOSI23、MISO19、SDA/SS5、RST27</dd></div><div><dt>函式庫</dt><dd>MFRC522</dd></div><div><dt>可做應用</dt><dd>簽到、門禁、借閱</dd></div></dl></article>
+          <article class="catalog-card" data-level="advanced"><div class="catalog-top"><span>S14 · 困難</span><b>I2S</b></div><h3>INMP441 數位麥克風</h3><p>用 I2S 取樣聲音，進一步做音量、頻譜或串流。</p><dl><div><dt>常見接線</dt><dd>BCLK→26、WS→25、SD→33、3V3／GND</dd></div><div><dt>函式庫</dt><dd>ESP32 I2S API</dd></div><div><dt>可做應用</dt><dd>聲控、即時音訊</dd></div></dl></article>
+          <article class="catalog-card" data-level="advanced"><div class="catalog-top"><span>S15 · 困難</span><b>UART</b></div><h3>NEO-6M GPS</h3><p>接收經緯度與時間資料，練習第二組 UART。</p><dl><div><dt>常見接線</dt><dd>GPS TX→ESP32 RX16；GPS RX→TX17</dd></div><div><dt>函式庫</dt><dd>TinyGPSPlus</dd></div><div><dt>可做應用</dt><dd>定位、軌跡記錄</dd></div></dl></article>
+          <article class="catalog-card" data-level="advanced"><div class="catalog-top"><span>S16 · 困難</span><b>SPI</b></div><h3>AS608 指紋模組</h3><p>從 UART 指令進入資料庫、比對與權限管理。</p><dl><div><dt>常見接線</dt><dd>模組 TX/RX 接 ESP32 UART，供電依模組</dd></div><div><dt>函式庫</dt><dd>Adafruit Fingerprint Sensor</dd></div><div><dt>可做應用</dt><dd>指紋門禁、身分辨識</dd></div></dl></article>
+          <article class="catalog-card" data-level="advanced"><div class="catalog-top"><span>S17 · 困難</span><b>UART</b></div><h3>光學心率感測器</h3><p>讀取脈搏與血氧類資料，適合用來練習資料清理。</p><dl><div><dt>常見接線</dt><dd>I2C 或 UART，依 MAX30102 模組版本</dd></div><div><dt>函式庫</dt><dd>MAX30105 / MAX3010x 系列函式庫</dd></div><div><dt>可做應用</dt><dd>生理資料展示</dd></div></dl></article>
+        </section>
+
+        <section class="note-strip section-pad"><strong>安全提醒</strong><p>ESP32 GPIO 不可直接承受 5V。HC-SR04、MQ-2、LCD 與其他模組的供電和訊號電壓，必須先看模組版本與資料表。</p></section>
+      </main>
+      <footer class="footer section-pad"><div><strong>ESP32 實作學習站</strong><span>感應器索引初版 · 內容會持續補齊</span></div><p>每個感應器的完整頁面會補上實測腳位與接線圖。</p></footer>
+    </div>
+    <script src="./app.js"></script>
+  </body>
+</html>

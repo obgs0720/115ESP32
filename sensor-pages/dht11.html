@@ -1,0 +1,127 @@
+<!doctype html>
+<html lang="zh-Hant">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="description" content="ESP32S 搭配 DHT11 溫濕度感測器完整教學，包含接腳、接線、函式庫、範例程式與使用情境。" />
+    <title>DHT11 × ESP32S 完整教學｜ESP32 實作學習站</title>
+    <link rel="icon" type="image/svg+xml" href="../favicon.svg" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;500;600;700;800&family=Space+Grotesk:wght@500;600;700&display=swap" rel="stylesheet" />
+    <link rel="stylesheet" href="../styles.css" />
+  </head>
+  <body>
+    <div class="site-shell">
+      <header class="topbar">
+        <a class="brand" href="../index.html" aria-label="回到首頁"><span class="brand-mark" aria-hidden="true"><span></span><span></span><span></span></span><span><strong>ESP32</strong><small>實作學習站</small></span></a>
+        <nav class="main-nav" aria-label="主要導覽"><a href="../index.html#map">學習地圖</a><a href="../modules.html">模組</a><a class="active" href="../sensors.html">感應器</a><a href="../code.html">程式基礎</a></nav>
+        <button class="menu-button" type="button" aria-label="開啟導覽選單" aria-expanded="false">選單</button>
+      </header>
+
+      <main class="lesson-page">
+        <section class="lesson-hero section-pad"><div><p class="eyebrow"><span class="eyebrow-dot"></span>感應器教學 / DHT11</p><h1>用 ESP32S<br /><em>讀取溫度與濕度。</em></h1><p class="hero-text">從接腳、接線到函式庫與完整程式，完成第一個環境感測器實作。</p></div><figure class="lesson-hero-image"><img src="../assets/dht11-sensor-realistic.png" alt="藍色 DHT11 溫濕度感測器模組寫實照片" /><figcaption>實際常見的 DHT11 三腳位模組</figcaption></figure></section>
+
+        <section class="lesson-section section-pad"><div class="section-heading"><div><p class="eyebrow">01 / 教學目標</p><h2>完成本單元後，你可以</h2></div></div><div class="lesson-list lesson-list-numbered"><p>認識 DHT11 溫濕度感測器的功能。</p><p>了解 DHT11 的接腳與工作方式。</p><p>將 DHT11 正確接到 ESP32S。</p><p>在 Arduino IDE 安裝所需函式庫。</p><p>撰寫程式讀取溫度與相對濕度。</p><p>將感測資料應用於風扇控制、環境監測或警報系統。</p></div></section>
+
+        <section class="lesson-section lesson-soft section-pad"><div class="lesson-split"><article><p class="eyebrow">02 / 感應器</p><h2>DHT11 感測器介紹</h2><p>DHT11 是一款低成本的數位式溫濕度感測器，可以同時測量空氣溫度與相對濕度。</p><p>DHT11 內部包含溫度感測元件、電容式濕度感測元件、內部校正資料與數位訊號處理電路。感測器會將量測結果轉換成數位訊號，再透過一條 DATA 資料線傳送給 ESP32。</p><p>DHT11 適合入門與一般環境監測，但不適合要求高精度的應用。</p><p class="lesson-source">不同廠牌或副廠模組的規格可能略有差異。參考：<a href="https://ece-classes.usc.edu/ee459/library/datasheets/DHT11.pdf" target="_blank" rel="noreferrer">DHT11 技術資料</a>、<a href="https://www.olimex.com/Products/Components/Sensors/Temperature/SNS-DHT11/" target="_blank" rel="noreferrer">Olimex DHT11 模組資料</a></p></article><figure class="lesson-image-card"><img src="../assets/dht11-sensor-realistic.png" alt="DHT11 感測器模組近拍" /><figcaption>藍色外殼內是溫度與濕度感測元件，底部為模組電路板與接腳。</figcaption></figure></div><div class="spec-grid"><div><b>0～50°C</b><span>溫度測量範圍</span></div><div><b>±2°C</b><span>溫度精度</span></div><div><b>20～80%RH</b><span>常見濕度範圍</span></div><div><b>±5%RH</b><span>濕度精度</span></div><div><b>1°C</b><span>溫度解析度</span></div><div><b>1%RH</b><span>濕度解析度</span></div></div></section>
+
+        <section class="lesson-section section-pad"><div class="lesson-split lesson-split-reverse"><article><p class="eyebrow">03 / 開發平台</p><h2>ESP32S 開發板介紹</h2><p>ESP32S 是以 ESP32 晶片為核心的微控制器開發板，具有 Wi-Fi、Bluetooth、多組數位輸入輸出腳位、類比輸入功能與低功耗模式，適合物聯網應用。</p><p>本教學使用 GPIO4 連接 DHT11 的 DATA 腳位。ESP32 的 GPIO 工作電壓為 3.3V，因此本教學建議 DHT11 使用 ESP32 的 3.3V 供電。</p></article><div class="lesson-callout"><strong>本教學使用的腳位</strong><span>DATA → GPIO4</span><span>VCC → 3V3</span><span>GND → GND</span></div></div></section>
+
+        <section class="lesson-section lesson-soft section-pad"><div class="section-heading"><div><p class="eyebrow">04 / 接腳說明</p><h2>DHT11 的接腳</h2></div></div><div class="pinout-grid"><article><h3>裸感測器版本</h3><p>當感測器正面格柵朝向自己、接腳朝下時，常見排列如下：</p><pre class="pinout-art">┌─────────────┐
+│    DHT11    │
+└─────────────┘
+  1    2    3    4
+ VCC DATA  NC  GND</pre><p>VCC 是電源輸入，DATA 是數位資料輸出，NC 未連接，GND 接地。</p></article><article><h3>三腳位模組版本</h3><p>市面上常見的 DHT11 模組已經焊接電阻，通常只有三個接腳：</p><div class="pin-badges"><b>VCC</b><b>DATA</b><b>GND</b></div><p>不同廠牌模組的接腳排列可能不同，實際接線前應確認模組上的標示。</p></article></div></section>
+
+        <section class="lesson-section section-pad"><div class="section-heading"><div><p class="eyebrow">05 / 接線圖</p><h2>ESP32S 與 DHT11 接線</h2></div></div><div class="wiring-reference-grid"><figure class="lesson-image-card wiring-photo"><img src="../assets/dht11-esp32-wiring-realistic.png" alt="ESP32S 與 DHT11 在麵包板上的寫實接線照片" /><figcaption>寫實接線參考：紅線為 3V3、黃線為 DATA、黑線為 GND。</figcaption></figure><figure class="wiring-diagram-card"><figcaption>精確對應圖：請依 ESP32S 板上的絲印尋找 3V3、GPIO4 與 GND。</figcaption><svg class="pin-wiring-svg" viewBox="0 0 760 390" role="img" aria-labelledby="wiring-svg-title wiring-svg-desc"><title id="wiring-svg-title">DHT11 與 ESP32S 接線圖</title><desc id="wiring-svg-desc">DHT11 的 VCC 接 ESP32S 的 3V3，DATA 接 GPIO4，GND 接 GND。</desc><defs><marker id="arrow-red" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M 0 0 L 10 5 L 0 10 z" fill="#d66f4f" /></marker><marker id="arrow-yellow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M 0 0 L 10 5 L 0 10 z" fill="#c58e26" /></marker><marker id="arrow-black" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M 0 0 L 10 5 L 0 10 z" fill="#28352f" /></marker></defs><rect x="24" y="24" width="230" height="322" rx="18" fill="#f4f8f2" stroke="#d6e0d5" /><text x="139" y="62" text-anchor="middle" class="svg-title">DHT11 模組</text><rect x="78" y="96" width="122" height="108" rx="12" fill="#20a9df" stroke="#147aa9" stroke-width="3" /><path d="M94 119h90M94 145h90M94 171h90" stroke="#bceaff" stroke-width="9" stroke-linecap="round" /><text x="139" y="238" text-anchor="middle" class="svg-subtitle">三腳位版本</text><circle cx="82" cy="287" r="9" fill="#d66f4f" /><circle cx="139" cy="287" r="9" fill="#c58e26" /><circle cx="196" cy="287" r="9" fill="#28352f" /><text x="82" y="320" text-anchor="middle" class="svg-pin">VCC</text><text x="139" y="320" text-anchor="middle" class="svg-pin">DATA</text><text x="196" y="320" text-anchor="middle" class="svg-pin">GND</text><rect x="506" y="24" width="230" height="322" rx="18" fill="#202d2b" stroke="#3e675a" /><text x="621" y="62" text-anchor="middle" class="svg-title svg-light">ESP32S</text><rect x="554" y="91" width="134" height="182" rx="11" fill="#111b1a" stroke="#81978d" stroke-width="2" /><rect x="590" y="132" width="62" height="73" rx="8" fill="#b8c0bc" /><text x="621" y="174" text-anchor="middle" class="svg-chip">ESP32</text><circle cx="536" cy="101" r="8" fill="#d66f4f" /><circle cx="536" cy="177" r="8" fill="#c58e26" /><circle cx="536" cy="253" r="8" fill="#28352f" /><text x="555" y="106" class="svg-pin svg-light" text-anchor="end">3V3</text><text x="555" y="182" class="svg-pin svg-light" text-anchor="end">GPIO4</text><text x="555" y="258" class="svg-pin svg-light" text-anchor="end">GND</text><path d="M82 287 C300 287, 332 101, 536 101" fill="none" stroke="#d66f4f" stroke-width="5" marker-end="url(#arrow-red)" /><path d="M139 287 C320 287, 348 177, 536 177" fill="none" stroke="#c58e26" stroke-width="5" marker-end="url(#arrow-yellow)" /><path d="M196 287 C346 287, 377 253, 536 253" fill="none" stroke="#28352f" stroke-width="5" marker-end="url(#arrow-black)" /><rect x="296" y="72" width="166" height="30" rx="15" fill="#fff5ef" /><text x="379" y="92" text-anchor="middle" class="svg-label svg-red">VCC → 3V3</text><rect x="296" y="163" width="166" height="30" rx="15" fill="#fff8df" /><text x="379" y="183" text-anchor="middle" class="svg-label svg-yellow">DATA → GPIO4</text><rect x="296" y="250" width="166" height="30" rx="15" fill="#eef2ef" /><text x="379" y="270" text-anchor="middle" class="svg-label svg-black">GND → GND</text></svg></figure></div><div class="wiring-details"><article><h3>建議接線</h3><div class="wiring-table"><div><b>DHT11</b><b>ESP32S</b></div><div><span>VCC</span><span>3V3</span></div><div><span>DATA</span><span>GPIO4</span></div><div><span>GND</span><span>GND</span></div></div><p>若使用裸 DHT11，DATA 與 3.3V 之間建議加上 4.7kΩ～10kΩ 的上拉電阻。若使用已經焊好電阻的三腳位 DHT11 模組，通常不需要另外加裝上拉電阻。</p><div class="warning-box"><strong>重要注意事項</strong><p>ESP32 的 GPIO 不耐受 5V。初學時建議直接使用 3.3V 供電，並確認 ESP32 與 DHT11 共用 GND。</p></div></article></div></section>
+
+        <section class="lesson-section lesson-dark section-pad"><div class="section-heading"><div><p class="eyebrow">06 / 函式庫</p><h2>在 Arduino IDE 安裝函式庫</h2></div></div><div class="install-steps"><div><b>01</b><p>開啟「工具」→「管理程式庫」。</p></div><div><b>02</b><p>搜尋並安裝 <code>DHT sensor library</code>，發行者選擇 Adafruit。</p></div><div><b>03</b><p>另外搜尋並安裝 <code>Adafruit Unified Sensor</code>。</p></div><div><b>04</b><p>開發板選擇 ESP32 Arduino → NodeMCU-32S。</p></div></div></section>
+
+        <section class="lesson-section lesson-soft section-pad"><div class="section-heading"><div><p class="eyebrow">07 / 完整範例</p><h2>DHT11 基本範例程式</h2></div></div><div class="code-block-wrap"><div class="code-block-toolbar"><span>Arduino / DHT11</span><button class="copy-code-button" type="button" data-copy-target="dht11-example-code" aria-label="複製 DHT11 範例程式">複製程式碼</button></div><pre class="lesson-code"><code id="dht11-example-code">#include &lt;Adafruit_Sensor.h&gt;
+#include &lt;DHT.h&gt;
+
+// DHT11 DATA 腳位接到 ESP32 GPIO4
+#define DHTPIN 4
+
+// 使用 DHT11
+#define DHTTYPE DHT11
+
+// 建立 DHT 感測器物件
+DHT dht(DHTPIN, DHTTYPE);
+
+// 記錄上一次讀取時間
+unsigned long previousMillis = 0;
+
+// DHT11 建議至少間隔 1 秒，這裡使用 2 秒
+const unsigned long interval = 2000;
+
+void setup() {
+  Serial.begin(115200);
+
+  Serial.println();
+  Serial.println("DHT11 溫濕度感測器啟動中...");
+
+  dht.begin();
+
+  // 等待感測器穩定
+  delay(2000);
+}
+
+void loop() {
+  unsigned long currentMillis = millis();
+
+  // 尚未達到讀取間隔時，不讀取感測器
+  if (currentMillis - previousMillis &lt; interval) {
+    return;
+  }
+
+  previousMillis = currentMillis;
+
+  // 讀取濕度
+  float humidity = dht.readHumidity();
+
+  // 讀取攝氏溫度
+  float temperature = dht.readTemperature();
+
+  // 判斷資料是否讀取成功
+  if (isnan(humidity) || isnan(temperature)) {
+    Serial.println("讀取 DHT11 失敗，請檢查接線！");
+    return;
+  }
+
+  Serial.println("----------------------------");
+
+  Serial.print("溫度：");
+  Serial.print(temperature);
+  Serial.println(" °C");
+
+  Serial.print("濕度：");
+  Serial.print(humidity);
+  Serial.println(" %RH");
+}</code></pre></div><div class="lesson-explain"><p><code>#define DHTPIN 4</code> 表示 DHT11 的 DATA 腳位連接到 GPIO4；<code>#define DHTTYPE DHT11</code> 表示目前使用 DHT11。若改用 DHT22，必須改成 <code>DHT22</code>。</p><p><code>isnan()</code> 用來判斷感測器是否傳回無效資料。DHT11 建議不要過於頻繁讀取，本範例使用兩秒讀取一次。</p></div></section>
+
+        <section class="lesson-section section-pad"><div class="lesson-split lesson-split-reverse"><article><p class="eyebrow">08 / 序列埠監控</p><h2>查看感測結果</h2><p>上傳程式後，開啟 Arduino IDE 的序列埠監控視窗，鮑率設定為 115200。</p><pre class="serial-output">DHT11 溫濕度感測器啟動中...
+----------------------------
+溫度：27.00 °C
+濕度：62.00 %RH
+----------------------------
+溫度：28.00 °C
+濕度：63.00 %RH</pre><p>DHT11 的解析度通常為整數，因此顯示的溫度與濕度不一定會有小數。</p></article><figure class="lesson-image-card"><img src="../assets/dht11-use-case-realistic.png" alt="ESP32、DHT11 與顯示器在教室植物旁的環境監測應用" /><figcaption>延伸應用：將感測資料顯示在 OLED，並放在教室植物旁進行環境監測。</figcaption></figure></div></section>
+
+        <section class="lesson-section lesson-soft section-pad"><div class="section-heading"><div><p class="eyebrow">09 / 問題排除</p><h2>常見問題與排除方法</h2></div></div><div class="troubleshooting-grid"><article><h3>讀取 DHT11 失敗</h3><p>檢查 DATA 是否接到 GPIO4、程式中的 <code>DHTPIN</code> 是否為 4、VCC 是否接 3.3V、GND 是否共地，以及兩個函式庫是否都已安裝。</p></article><article><h3>顯示 0 或 NaN</h3><p>可能是 DATA 線沒有上拉電阻、感測器接腳接反、使用 5V 訊號輸入 ESP32、DATA 線太長或感測器損壞。</p></article><article><h3>數值跳動很大</h3><p>避免感測器靠近 ESP32 晶片、穩壓器、風扇或熱源，並確認電源穩定與讀取頻率沒有過快。</p></article></div></section>
+
+        <section class="lesson-section section-pad"><div class="section-heading"><div><p class="eyebrow">10 / 使用情境</p><h2>把資料做成實際應用</h2></div></div><div class="scenario-grid"><article><span>01</span><h3>教室環境監測</h3><p>每兩秒讀取一次溫度和濕度，搭配 OLED 或網頁顯示資料；溫度高於 30°C 或濕度高於 70%RH 時顯示提醒。</p></article><article><span>02</span><h3>自動風扇控制</h3><p>當溫度超過設定值時啟動風扇。ESP32 GPIO 不應直接連接馬達或大型風扇，應使用繼電器模組、電晶體或 MOSFET。</p></article><article><span>03</span><h3>植物溫室監測</h3><p>溫度過高時啟動排風扇，濕度太低時啟動加濕器；DHT11 應放在通風且不會淋水的位置。</p></article><article><span>04</span><h3>物聯網資料上傳</h3><p>利用 ESP32 內建 Wi-Fi，將 DHT11 資料上傳到 MQTT、ThingSpeak、Blynk、自製網頁或其他雲端資料庫。</p></article></div></section>
+
+        <section class="lesson-section lesson-dark section-pad"><div class="lesson-split"><article><p class="eyebrow">11 / 課程延伸</p><h2>完成基本範例後，繼續挑戰</h2><p>可以使用 OLED 顯示溫度和濕度、用 LED 顯示環境是否過熱、用蜂鳴器製作高溫警報、使用繼電器控制風扇，或將資料上傳到 MQTT。</p></article><div class="challenge-list"><b>01</b><span>OLED 溫濕度儀表板</span><b>02</b><span>高溫蜂鳴器警報</span><b>03</b><span>Wi-Fi 雲端資料記錄</span><b>04</b><span>教室環境監測專題</span></div></div></section>
+
+        <section class="lesson-summary section-pad"><p class="eyebrow">重點整理</p><h2>DHT11 × ESP32S</h2><pre class="summary-wiring">DHT11 VCC   → ESP32 3V3
+DHT11 DATA  → ESP32 GPIO4
+DHT11 GND   → ESP32 GND</pre><p>程式中最重要的設定是 <code>#define DHTPIN 4</code> 與 <code>#define DHTTYPE DHT11</code>。DHT11 適合用來學習感測器、微控制器與物聯網的基本概念；若未來需要更高精度，可升級至 DHT22、AHT20 或 SHT31。</p></section>
+      </main>
+      <footer class="footer section-pad"><div><strong>ESP32 實作學習站</strong><span>DHT11 × ESP32S 完整教學</span></div><p><a href="../sensors.html">← 回到感應器索引</a></p></footer>
+    </div>
+    <script src="../app.js"></script>
+  </body>
+</html>
+

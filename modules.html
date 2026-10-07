@@ -1,0 +1,57 @@
+<!doctype html>
+<html lang="zh-Hant">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="description" content="ESP32 模組索引：輸出、顯示、馬達與無線模組，依學習難度分類。" />
+    <title>ESP32 模組索引｜ESP32 實作學習站</title>
+    <link rel="icon" type="image/svg+xml" href="./favicon.svg" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;500;600;700;800&family=Space+Grotesk:wght@500;600;700&display=swap" rel="stylesheet" />
+    <link rel="stylesheet" href="./styles.css" />
+  </head>
+  <body>
+    <div class="site-shell">
+      <header class="topbar">
+        <a class="brand" href="./index.html" aria-label="回到首頁"><span class="brand-mark" aria-hidden="true"><span></span><span></span><span></span></span><span><strong>ESP32</strong><small>實作學習站</small></span></a>
+        <nav class="main-nav" aria-label="主要導覽">
+          <a href="./index.html#map">學習地圖</a><a class="active" href="./modules.html">模組</a><a href="./sensors.html">感應器</a><a href="./code.html">程式基礎</a>
+        </nav>
+        <button class="menu-button" type="button" aria-label="開啟導覽選單" aria-expanded="false">選單</button>
+      </header>
+
+      <main class="inner-page">
+        <section class="page-hero section-pad">
+          <div><p class="eyebrow"><span class="eyebrow-dot"></span>模組索引 / 輸出與連線</p><h1>讓 ESP32<br /><em>產生動作與回應。</em></h1><p class="hero-text">這一頁集中整理輸出、顯示、馬達與無線模組。先用難度找適合的元件，再進入單篇教學補齊接線與程式。</p></div>
+          <div class="page-hero-mark"><span class="mark-line"></span><strong>OUTPUT<br />/ MODULES</strong><small>LED · MOTOR · DISPLAY · IoT</small></div>
+        </section>
+
+        <section class="catalog-toolbar section-pad">
+          <div><p class="eyebrow">01 / 依程度瀏覽</p><h2>先從簡單輸出開始</h2></div>
+          <div class="filter-group" role="group" aria-label="模組難度篩選"><button class="level-filter is-active" data-level="all" type="button">全部 <span>13</span></button><button class="level-filter" data-level="beginner" type="button">簡單 <span>3</span></button><button class="level-filter" data-level="intermediate" type="button">中等 <span>5</span></button><button class="level-filter" data-level="advanced" type="button">困難 <span>5</span></button></div>
+        </section>
+
+        <section class="catalog-grid section-pad" aria-label="ESP32 模組清單">
+          <article class="catalog-card" data-level="beginner"><div class="catalog-top"><span>M01 · 簡單</span><b>GPIO</b></div><h3>LED 單色燈</h3><p>練習數位輸出、限流電阻與 Blink，適合第一個實作。</p><dl><div><dt>常見接線</dt><dd>GPIO23 → 220Ω → LED → GND</dd></div><div><dt>函式庫</dt><dd>不需外部函式庫</dd></div><div><dt>可做應用</dt><dd>狀態燈、警示燈</dd></div></dl></article>
+          <article class="catalog-card" data-level="beginner"><div class="catalog-top"><span>M02 · 簡單</span><b>LEDC</b></div><h3>RGB LED</h3><p>把三個顏色通道分別接到 PWM，練習混色與亮度控制。</p><dl><div><dt>常見接線</dt><dd>R/G/B → 220Ω → GPIO25/26/27</dd></div><div><dt>函式庫</dt><dd>LEDC（ESP32 內建）</dd></div><div><dt>可做應用</dt><dd>情境燈、色彩提示</dd></div></dl></article>
+          <article class="catalog-card" data-level="beginner"><div class="catalog-top"><span>M03 · 簡單</span><b>LEDC</b></div><h3>無源蜂鳴器</h3><p>用頻率產生音高，從單音延伸成旋律或錯誤提示音。</p><dl><div><dt>常見接線</dt><dd>GPIO25 → SIG，VCC／GND 依模組</dd></div><div><dt>函式庫</dt><dd>LEDC 或 tone 類 API</dd></div><div><dt>可做應用</dt><dd>門鈴、倒數提示</dd></div></dl></article>
+          <article class="catalog-card" data-level="intermediate"><div class="catalog-top"><span>M04 · 中等</span><b>PWM</b></div><h3>SG90 伺服馬達</h3><p>用 PWM 控制角度，把感測值轉成實際的機械動作。</p><dl><div><dt>常見接線</dt><dd>SIG→GPIO13；外部 5V；GND 共地</dd></div><div><dt>函式庫</dt><dd>ESP32Servo</dd></div><div><dt>可做應用</dt><dd>自動門、指針、雲台</dd></div></dl></article>
+          <article class="catalog-card" data-level="intermediate"><div class="catalog-top"><span>M05 · 中等</span><b>I2C</b></div><h3>0.96 吋 OLED</h3><p>用兩條 I2C 線顯示文字、數值與簡單圖形。</p><dl><div><dt>常見接線</dt><dd>VCC→3V3、GND、SDA→21、SCL→22</dd></div><div><dt>函式庫</dt><dd>Wire、Adafruit GFX、SSD1306</dd></div><div><dt>可做應用</dt><dd>溫度儀表板、狀態頁</dd></div></dl></article>
+          <article class="catalog-card" data-level="intermediate"><div class="catalog-top"><span>M06 · 中等</span><b>I2C</b></div><h3>LCD1602 I2C</h3><p>把長文字與多行資訊顯示在液晶螢幕上。</p><dl><div><dt>常見接線</dt><dd>SDA→21、SCL→22；供電依模組標示</dd></div><div><dt>函式庫</dt><dd>LiquidCrystal_I2C</dd></div><div><dt>可做應用</dt><dd>倒數器、環境監控</dd></div></dl></article>
+          <article class="catalog-card" data-level="intermediate"><div class="catalog-top"><span>M07 · 中等</span><b>PIXEL</b></div><h3>WS2812B 彩色燈條</h3><p>一條資料線控制多顆 RGB LED，開始做燈效與動畫。</p><dl><div><dt>常見接線</dt><dd>DIN→GPIO4、5V、GND；資料線建議電阻</dd></div><div><dt>函式庫</dt><dd>FastLED 或 Adafruit NeoPixel</dd></div><div><dt>可做應用</dt><dd>桌面燈、音樂燈效</dd></div></dl></article>
+          <article class="catalog-card" data-level="intermediate"><div class="catalog-top"><span>M08 · 中等</span><b>RELAY</b></div><h3>單路繼電器</h3><p>用低電壓 GPIO 控制另一側的負載，認識隔離與安全。</p><dl><div><dt>常見接線</dt><dd>IN→GPIO26、VCC／GND 依模組規格</dd></div><div><dt>函式庫</dt><dd>不需外部函式庫</dd></div><div><dt>可做應用</dt><dd>燈具、風扇、抽水馬達</dd></div></dl></article>
+          <article class="catalog-card" data-level="advanced"><div class="catalog-top"><span>M09 · 困難</span><b>STEPPER</b></div><h3>28BYJ-48 步進馬達</h3><p>控制步數與轉速，理解驅動板、步進與位置概念。</p><dl><div><dt>常見接線</dt><dd>ULN2003 IN1–IN4→GPIO16–19</dd></div><div><dt>函式庫</dt><dd>AccelStepper</dd></div><div><dt>可做應用</dt><dd>旋轉平台、窗簾</dd></div></dl></article>
+          <article class="catalog-card" data-level="advanced"><div class="catalog-top"><span>M10 · 困難</span><b>SPI</b></div><h3>MAX7219 8×8 點矩陣</h3><p>使用 SPI 類型介面控制大量 LED，練習位元與顯示資料。</p><dl><div><dt>常見接線</dt><dd>DIN→23、CLK→18、CS→5、VCC／GND</dd></div><div><dt>函式庫</dt><dd>LedControl 或 MD_MAX72XX</dd></div><div><dt>可做應用</dt><dd>跑馬燈、簡易字型</dd></div></dl></article>
+          <article class="catalog-card" data-level="advanced"><div class="catalog-top"><span>M11 · 困難</span><b>SPI</b></div><h3>ILI9341 TFT 觸控螢幕</h3><p>從單色文字進階到彩色圖形、按鈕與觸控互動。</p><dl><div><dt>常見接線</dt><dd>SCK18、MOSI23、MISO19、CS／DC 依設定</dd></div><div><dt>函式庫</dt><dd>TFT_eSPI 或 LovyanGFX</dd></div><div><dt>可做應用</dt><dd>儀表板、互動遊戲</dd></div></dl></article>
+          <article class="catalog-card" data-level="advanced"><div class="catalog-top"><span>M12 · 困難</span><b>CAMERA</b></div><h3>ESP32-CAM</h3><p>整合相機、Wi‑Fi 與記憶卡，進入影像串流與辨識專題。</p><dl><div><dt>常見接線</dt><dd>依 ESP32-CAM 型號與相機腳位表</dd></div><div><dt>函式庫</dt><dd>esp_camera、WebServer</dd></div><div><dt>可做應用</dt><dd>網路攝影機、影像辨識</dd></div></dl></article>
+          <article class="catalog-card" data-level="advanced"><div class="catalog-top"><span>M13 · 困難</span><b>WIRELESS</b></div><h3>Wi‑Fi / BLE 無線連線</h3><p>把 ESP32 連到手機、瀏覽器或另一台開發板。</p><dl><div><dt>常見接線</dt><dd>無需外部訊號腳位，依專案加裝周邊</dd></div><div><dt>函式庫</dt><dd>WiFi、BLE、BluetoothSerial</dd></div><div><dt>可做應用</dt><dd>Web Server、手機遙控</dd></div></dl></article>
+        </section>
+
+        <section class="note-strip section-pad"><strong>使用前提醒</strong><p>不同板型與模組版本的供電和腳位可能不同；正式教學頁會針對每個型號附上版本、腳位表與接線圖。</p></section>
+      </main>
+      <footer class="footer section-pad"><div><strong>ESP32 實作學習站</strong><span>模組索引初版 · 內容會持續補齊</span></div><p>先確認模組電壓與共地，再接上 GPIO。</p></footer>
+    </div>
+    <script src="./app.js"></script>
+  </body>
+</html>

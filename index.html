@@ -1,0 +1,162 @@
+<!doctype html>
+<html lang="zh-Hant">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="description" content="以 Arduino IDE 學習 ESP32、感測器接線、腳位與實作程式的教學網站。" />
+    <title>ESP32 實作學習站</title>
+    <link rel="icon" type="image/svg+xml" href="./favicon.svg" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;500;600;700;800&family=Space+Grotesk:wght@500;600;700&display=swap" rel="stylesheet" />
+    <link rel="stylesheet" href="./styles.css" />
+  </head>
+  <body>
+    <div class="site-shell">
+      <header class="topbar">
+        <a class="brand" href="#top" aria-label="回到首頁">
+          <span class="brand-mark" aria-hidden="true"><span></span><span></span><span></span></span>
+          <span>
+            <strong>ESP32</strong>
+            <small>實作學習站</small>
+          </span>
+        </a>
+        <nav class="main-nav" aria-label="主要導覽">
+          <a class="active" href="#map">學習地圖</a>
+          <a href="./modules.html">模組</a>
+          <a href="./sensors.html">感應器</a>
+          <a href="./code.html">程式基礎</a>
+        </nav>
+        <button class="menu-button" type="button" aria-label="開啟導覽選單" aria-expanded="false">選單</button>
+      </header>
+
+      <main id="top">
+        <section class="hero section-pad">
+          <div class="hero-copy">
+            <p class="eyebrow"><span class="eyebrow-dot"></span>從接線到作品，建立你的第一個 IoT 專案</p>
+            <h1>把 ESP32 學會，<em>也把它做出來。</em></h1>
+            <p class="hero-text">用清楚的腳位、接線和程式說明，循序完成 LED、溫濕度、距離、顯示器與無線應用。</p>
+            <div class="hero-actions">
+              <a class="button button-primary" href="#map">開始學習</a>
+              <a class="text-link" href="./sensors.html">先找感應器 <span aria-hidden="true">↘</span></a>
+            </div>
+          </div>
+          <div class="hero-board" aria-label="ESP32 學習內容概覽">
+            <div class="board-noise"></div>
+            <div class="board-label">LEARNING BOARD / 01</div>
+            <div class="board-chip">ESP<br /><span>32</span></div>
+            <div class="board-pin pin-a">3V3</div>
+            <div class="board-pin pin-b">GND</div>
+            <div class="board-pin pin-c">GPIO 23</div>
+            <div class="board-route route-a"></div>
+            <div class="board-route route-b"></div>
+            <div class="board-route route-c"></div>
+            <div class="board-footer"><span>Wi‑Fi</span><span>Bluetooth</span><span>Arduino IDE</span></div>
+          </div>
+        </section>
+
+        <section class="quick-stats section-pad" aria-label="網站內容摘要">
+          <div><strong>03</strong><span>學習程度</span></div>
+          <div><strong>24</strong><span>首波元件</span></div>
+          <div><strong>01</strong><span>固定教學格式</span></div>
+          <p>每篇都會回答：要準備什麼、接哪裡、裝哪個函式庫、程式怎麼運作。</p>
+        </section>
+
+        <section id="map" class="learning-map section-pad">
+          <div class="section-heading">
+            <div>
+              <p class="eyebrow">01 / 學習地圖</p>
+              <h2>從看懂板子，到完成作品</h2>
+            </div>
+            <p>先選一個難度，再沿著實作路線前進。這裡會逐步補上完整教材。</p>
+          </div>
+
+          <div class="level-grid">
+            <button class="level-card is-selected" data-level="beginner" type="button">
+              <span class="level-number">01</span>
+              <span class="level-icon">◎</span>
+              <span class="level-title">簡單 · 先讓它動起來</span>
+              <span class="level-description">認識 ESP32、GPIO、Arduino IDE，完成點燈與按鈕輸入。</span>
+              <span class="level-meta">4 個單元 <b>→</b></span>
+            </button>
+            <button class="level-card" data-level="intermediate" type="button">
+              <span class="level-number">02</span>
+              <span class="level-icon">◌</span>
+              <span class="level-title">中等 · 讀懂周邊資料</span>
+              <span class="level-description">使用 DHT11、HC-SR04、OLED，理解數位、類比與 I2C。</span>
+              <span class="level-meta">5 個單元 <b>→</b></span>
+            </button>
+            <button class="level-card" data-level="advanced" type="button">
+              <span class="level-number">03</span>
+              <span class="level-icon">↗</span>
+              <span class="level-title">困難 · 連線做成系統</span>
+              <span class="level-description">把感測資料送上網路，加入 BLE、Web Server 與專題整合。</span>
+              <span class="level-meta">5 個單元 <b>→</b></span>
+            </button>
+          </div>
+        </section>
+
+        <section class="featured section-pad" aria-labelledby="featured-title">
+          <div class="featured-intro">
+            <p class="eyebrow">推薦起點 · 簡單</p>
+            <h2 id="featured-title">第一個作品：讓 LED 閃爍</h2>
+            <p id="featured-description">從最少的零件開始，理解 GPIO 輸出、限流電阻，以及 setup() 和 loop() 的角色。</p>
+            <div class="lesson-tags"><span>GPIO</span><span>Arduino IDE</span><span>數位輸出</span></div>
+            <button class="button button-dark" id="change-lesson" type="button">換一個學習範例</button>
+          </div>
+          <div class="wiring-card">
+            <div class="wiring-header"><span>接線預覽</span><span class="wiring-status"><i></i>GPIO 23</span></div>
+            <svg class="wiring-diagram" viewBox="0 0 640 270" role="img" aria-label="ESP32 GPIO 23 透過 220 歐姆電阻連接 LED 再接到 GND 的示意圖">
+              <defs>
+                <linearGradient id="boardGradient" x1="0" y1="0" x2="1" y2="1">
+                  <stop offset="0" stop-color="#263b35" />
+                  <stop offset="1" stop-color="#152621" />
+                </linearGradient>
+              </defs>
+              <rect x="20" y="35" width="160" height="190" rx="16" fill="url(#boardGradient)" />
+              <text x="42" y="65" fill="#eff7eb" font-size="14" font-family="Space Grotesk">ESP32</text>
+              <text x="42" y="86" fill="#9eb9ad" font-size="10" font-family="Space Grotesk">DEVKIT / GPIO MAP</text>
+              <circle cx="180" cy="110" r="6" fill="#f7ba5b" />
+              <text x="43" y="118" fill="#f7ba5b" font-size="12" font-family="Space Grotesk">GPIO 23</text>
+              <circle cx="180" cy="190" r="6" fill="#9eb9ad" />
+              <text x="43" y="198" fill="#9eb9ad" font-size="12" font-family="Space Grotesk">GND</text>
+              <path d="M186 110 H272" stroke="#f7ba5b" stroke-width="4" fill="none" />
+              <path d="M186 190 H566" stroke="#9eb9ad" stroke-width="4" fill="none" />
+              <path d="M272 110 l12 -12 l12 24 l12 -24 l12 24 l12 -24 l12 12" stroke="#f7ba5b" stroke-width="3" fill="none" />
+              <text x="280" y="78" fill="#f7ba5b" font-size="12" font-family="Noto Sans TC">220Ω 限流電阻</text>
+              <path d="M344 110 H415" stroke="#f7ba5b" stroke-width="4" fill="none" />
+              <circle cx="450" cy="110" r="24" fill="#f7ba5b" opacity="0.2" />
+              <circle cx="450" cy="110" r="12" fill="#f7ba5b" />
+              <path d="M462 110 H520 V190" stroke="#f7ba5b" stroke-width="4" fill="none" />
+              <path d="M450 88 V74 M437 95 L427 85 M463 95 L473 85" stroke="#f7ba5b" stroke-width="3" fill="none" />
+              <text x="432" y="150" fill="#eff7eb" font-size="12" font-family="Noto Sans TC">LED</text>
+              <text x="525" y="214" fill="#9eb9ad" font-size="12" font-family="Noto Sans TC">回到 GND</text>
+            </svg>
+            <div class="wiring-note"><span>訊號路徑</span><b>GPIO 23 → 電阻 → LED → GND</b></div>
+          </div>
+        </section>
+
+        <section class="page-entries section-pad" aria-labelledby="entry-title">
+          <div class="section-heading">
+            <div>
+              <p class="eyebrow">02 / 分頁學習</p>
+              <h2 id="entry-title">每一種內容，放到自己的頁面</h2>
+            </div>
+            <p>首頁只負責帶路；進入分頁後，再集中閱讀腳位、接線、函式庫與程式說明。</p>
+          </div>
+          <div class="entry-grid">
+            <a class="entry-card" href="./modules.html"><span class="entry-index">A / 模組</span><strong>控制與輸出</strong><p>LED、馬達、蜂鳴器、顯示器、繼電器與無線模組。</p><span class="entry-link">查看模組頁 ↗</span></a>
+            <a class="entry-card" href="./sensors.html"><span class="entry-index">B / 感應器</span><strong>讀取周圍世界</strong><p>溫度、距離、光線、動作、姿態、聲音與 RFID。</p><span class="entry-link">查看感應器頁 ↗</span></a>
+            <a class="entry-card" href="./code.html"><span class="entry-index">C / 程式基礎</span><strong>讀懂每一行</strong><p>從 setup()、loop() 到 GPIO、PWM、I2C、SPI 與 Wi‑Fi。</p><span class="entry-link">查看程式頁 ↗</span></a>
+          </div>
+        </section>
+      </main>
+
+      <footer class="footer section-pad">
+        <div><strong>ESP32 實作學習站</strong><span>教學架構初版 · 內容會持續補齊</span></div>
+        <p>接線前先確認供電電壓；ESP32 GPIO 通常以 3.3V 邏輯工作。</p>
+      </footer>
+    </div>
+    <script src="./app.js"></script>
+  </body>
+</html>

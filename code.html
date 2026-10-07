@@ -1,0 +1,79 @@
+<!doctype html>
+<html lang="zh-Hant">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="description" content="ESP32 程式基礎：Arduino IDE、GPIO、ADC、PWM、I2C、SPI、UART、Wi-Fi 與 BLE。" />
+    <title>ESP32 程式基礎｜ESP32 實作學習站</title>
+    <link rel="icon" type="image/svg+xml" href="./favicon.svg" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;500;600;700;800&family=Space+Grotesk:wght@500;600;700&display=swap" rel="stylesheet" />
+    <link rel="stylesheet" href="./styles.css" />
+  </head>
+  <body>
+    <div class="site-shell">
+      <header class="topbar">
+        <a class="brand" href="./index.html" aria-label="回到首頁"><span class="brand-mark" aria-hidden="true"><span></span><span></span><span></span></span><span><strong>ESP32</strong><small>實作學習站</small></span></a>
+        <nav class="main-nav" aria-label="主要導覽">
+          <a href="./index.html#map">學習地圖</a><a href="./modules.html">模組</a><a href="./sensors.html">感應器</a><a class="active" href="./code.html">程式基礎</a>
+        </nav>
+        <button class="menu-button" type="button" aria-label="開啟導覽選單" aria-expanded="false">選單</button>
+      </header>
+
+      <main class="inner-page">
+        <section class="page-hero code-hero section-pad">
+          <div><p class="eyebrow"><span class="eyebrow-dot"></span>程式基礎 / Arduino IDE</p><h1>看懂每一行，<br /><em>再把它改成你的。</em></h1><p class="hero-text">從 setup()、loop() 和 GPIO 開始，逐步理解感測器讀值、PWM、I2C、SPI、UART 與 Wi‑Fi 的程式骨架。</p></div>
+          <div class="page-hero-mark"><span class="mark-line"></span><strong>CODE<br />/ LOGIC</strong><small>SETUP · LOOP · READ · WRITE</small></div>
+        </section>
+
+        <section class="code-roadmap section-pad">
+          <div class="section-heading"><div><p class="eyebrow">01 / 程式學習路線</p><h2>從控制一顆燈，到連上網路</h2></div><p>每個主題都會搭配最小可執行範例，再說明如何接到模組與感應器。</p></div>
+          <div class="code-topic-grid">
+            <article class="code-topic"><span>01 · 簡單</span><h3>Arduino IDE 與程式骨架</h3><p>建立專案、選擇開發板與序列埠，認識 setup() 只執行一次、loop() 不斷重複。</p><a href="#blink">看 LED 範例 ↘</a></article>
+            <article class="code-topic"><span>02 · 簡單</span><h3>GPIO 輸入與輸出</h3><p>使用 pinMode、digitalRead、digitalWrite，讓按鈕控制 LED。</p><a href="#gpio">看 GPIO 範例 ↘</a></article>
+            <article class="code-topic"><span>03 · 中等</span><h3>ADC 與 PWM</h3><p>讀取旋鈕數值，再用 LEDC 改變 LED 亮度或蜂鳴器頻率。</p><a href="#pwm">看 PWM 範例 ↘</a></article>
+            <article class="code-topic"><span>04 · 中等</span><h3>I2C、SPI 與 UART</h3><p>理解匯流排如何連接多個周邊，並分辨 SDA/SCL、MOSI/MISO、TX/RX。</p><a href="#bus">看介面速查 ↘</a></article>
+            <article class="code-topic"><span>05 · 困難</span><h3>Wi‑Fi 與 Web Server</h3><p>讓 ESP32 連上基地台，回傳網頁或提供控制介面。</p><a href="#wifi">看 Wi‑Fi 骨架 ↘</a></article>
+            <article class="code-topic"><span>06 · 困難</span><h3>BLE 與 ESP-NOW</h3><p>從手機控制、兩板互傳到低延遲通訊，建立無線專題的程式結構。</p><a href="#wireless">看無線方向 ↘</a></article>
+          </div>
+        </section>
+
+        <section id="blink" class="code-lab section-pad"><div class="code-lab-copy"><p class="eyebrow">02 / 最小範例</p><h2>先讓 LED 閃爍</h2><p>這段程式是所有實作的起點：先設定腳位，再在 loop() 裡重複控制輸出。</p><ol><li><b>const int</b> 把腳位名稱固定下來。</li><li><b>pinMode</b> 指定腳位是輸入或輸出。</li><li><b>digitalWrite</b> 輸出 HIGH 或 LOW。</li></ol></div><div class="code-window"><div class="code-window-top"><span class="window-lights"><i></i><i></i><i></i></span><span>01_led_blink.ino</span><span>簡單</span></div><pre><code><span class="code-comment">// GPIO 23 接外部 LED</span>
+<span class="code-keyword">const int</span> LED_PIN = <span class="code-number">23</span>;
+
+<span class="code-keyword">void</span> <span class="code-function">setup</span>() {
+  <span class="code-function">pinMode</span>(LED_PIN, OUTPUT);
+}
+
+<span class="code-keyword">void</span> <span class="code-function">loop</span>() {
+  <span class="code-function">digitalWrite</span>(LED_PIN, HIGH);
+  <span class="code-function">delay</span>(<span class="code-number">1000</span>);
+  <span class="code-function">digitalWrite</span>(LED_PIN, LOW);
+  <span class="code-function">delay</span>(<span class="code-number">1000</span>);
+}</code></pre></div></section>
+
+        <section id="gpio" class="concept-grid section-pad"><article><p class="eyebrow">03 / GPIO</p><h2>輸入和輸出是兩種不同的角色</h2><p>按鈕、PIR 等元件通常提供輸入；LED、繼電器等元件接收輸出。教學中會先畫出訊號方向，再寫程式。</p></article><div class="concept-list"><div><b>INPUT</b><span>digitalRead / analogRead</span></div><div><b>OUTPUT</b><span>digitalWrite / ledcWrite</span></div><div><b>注意</b><span>ESP32 GPIO 邏輯通常是 3.3V</span></div></div></section>
+
+        <section id="pwm" class="code-lab code-lab-light section-pad"><div class="code-lab-copy"><p class="eyebrow">04 / ADC + PWM</p><h2>把讀到的數值轉成動作</h2><p>例如用可變電阻讀取 0–4095，再將數值換算為 LEDC 的亮度。這是「感測器 → 控制器 → 輸出」的基本模式。</p></div><div class="code-window"><div class="code-window-top"><span class="window-lights"><i></i><i></i><i></i></span><span>02_adc_to_pwm.ino</span><span>中等</span></div><pre><code><span class="code-keyword">const int</span> KNOB = <span class="code-number">34</span>;
+<span class="code-keyword">const int</span> LED = <span class="code-number">23</span>;
+
+<span class="code-keyword">void</span> <span class="code-function">setup</span>() {
+  <span class="code-function">ledcAttach</span>(LED, <span class="code-number">5000</span>, <span class="code-number">8</span>);
+}
+
+<span class="code-keyword">void</span> <span class="code-function">loop</span>() {
+  <span class="code-keyword">int</span> value = <span class="code-function">analogRead</span>(KNOB);
+  <span class="code-keyword">int</span> duty = <span class="code-function">map</span>(value, <span class="code-number">0</span>, <span class="code-number">4095</span>, <span class="code-number">0</span>, <span class="code-number">255</span>);
+  <span class="code-function">ledcWrite</span>(LED, duty);
+}</code></pre></div></section>
+
+        <section id="bus" class="interface-section section-pad"><div class="section-heading"><div><p class="eyebrow">05 / 介面速查</p><h2>接線之前，先分辨通訊方式</h2></div><p>實際腳位可依板型重新指定；表格內容是教學常用的 ESP32 DevKit 參考。</p></div><div class="interface-grid"><div><strong>GPIO</strong><span>單一腳位的輸入／輸出</span><b>LED、按鈕、PIR</b></div><div><strong>I2C</strong><span>SDA + SCL 兩條線</span><b>OLED、BME280、MPU6050</b></div><div><strong>SPI</strong><span>SCK、MOSI、MISO、CS</span><b>RC522、TFT、MAX7219</b></div><div><strong>UART</strong><span>TX + RX 序列資料</span><b>GPS、指紋、另一塊 ESP32</b></div><div><strong>I2S</strong><span>時脈與音訊資料</span><b>INMP441、音訊放大器</b></div><div><strong>Wi‑Fi / BLE</strong><span>無線資料與控制</span><b>Web Server、手機、IoT</b></div></div></section>
+
+        <section id="wifi" class="wireless-section section-pad"><div><p class="eyebrow">06 / 困難</p><h2>從板子，走到 IoT 系統</h2><p>當感測器資料要離開麵包板，就會進入 Wi‑Fi、BLE、HTTP、MQTT 或 ESP-NOW。這一區會在後續補上完整專題。</p></div><div class="wireless-steps"><div><span>01</span><b>讀取資料</b><small>DHT11 / BME280</small></div><div><span>02</span><b>整理格式</b><small>JSON / 狀態值</small></div><div><span>03</span><b>傳送出去</b><small>Wi‑Fi / BLE / ESP-NOW</small></div></div></section>
+      </main>
+      <footer class="footer section-pad"><div><strong>ESP32 實作學習站</strong><span>程式基礎初版 · 內容會持續補齊</span></div><p>程式要和接線一起看，不能只複製貼上。</p></footer>
+    </div>
+    <script src="./app.js"></script>
+  </body>
+</html>
