@@ -1,0 +1,213 @@
+<!doctype html>
+<html lang="zh-Hant">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="description" content="LCD1602 I2C 搭配 NodeMCU-32S 的完整教學，從顯示 Hello 到使用 DHT11 顯示目前溫度與濕度，包含接腳、接線圖、函式庫與完整程式。" />
+    <title>LCD1602 I2C × NodeMCU-32S 完整教學｜ESP32 實作學習站</title>
+    <link rel="icon" type="image/svg+xml" href="../favicon.svg" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;500;600;700;800&family=Space+Grotesk:wght@500;600;700&display=swap" rel="stylesheet" />
+    <link rel="stylesheet" href="../styles.css" />
+  </head>
+  <body class="lesson-page">
+    <div class="site-shell">
+      <header class="topbar">
+        <a class="brand" href="../index.html" aria-label="回到首頁"><span class="brand-mark" aria-hidden="true"><span></span><span></span><span></span></span><span><strong>ESP32</strong><small>實作學習站</small></span></a>
+        <nav class="main-nav" aria-label="主要導覽"><a href="../index.html#map">學習地圖</a><a class="active" href="../modules.html">模組</a><a href="../sensors.html">感應器</a><a href="../code.html">程式基礎</a></nav>
+        <button class="menu-button" type="button" aria-label="開啟導覽選單" aria-expanded="false">選單</button>
+      </header>
+
+      <main>
+        <section class="lesson-hero section-pad">
+          <div><p class="eyebrow"><span class="eyebrow-dot"></span>模組教學 / LCD1602 I2C</p><h1>讓 NodeMCU-32S<br /><em>顯示文字與環境數據。</em></h1><p class="hero-text">先讓 LCD 顯示 Hello，再接上 DHT11，將目前溫度與濕度即時顯示在 16×2 液晶螢幕上。</p></div>
+          <figure class="lesson-hero-image"><div class="lcd-hero-visual"><div class="lcd-device"><div class="lcd-screen"><span>Hello</span><span>ESP32S + LCD</span></div><div class="lcd-knobs"><span>LCD1602</span><span>I2C BACKPACK</span></div></div></div><figcaption>LCD1602 加上 I2C 背板後，只需要 SDA 與 SCL 兩條資料線。</figcaption></figure>
+        </section>
+
+        <section class="lesson-section section-pad">
+          <div class="section-heading"><div><p class="eyebrow">01 / 教學目標</p><h2>完成本單元後，你可以</h2></div></div>
+          <div class="lesson-list lesson-list-numbered"><p>認識 LCD1602 與 I2C 背板的功能。</p><p>知道 LCD1602 I2C 與 NodeMCU-32S 的每一條接線。</p><p>在 Arduino IDE 安裝並使用 LiquidCrystal_I2C 函式庫。</p><p>讓 LCD 顯示單獨的 Hello 文字。</p><p>接上 DHT11，顯示目前溫度與相對濕度。</p><p>遇到空白畫面、位址錯誤或 5V 訊號時，可以依檢查表排除問題。</p></div>
+        </section>
+
+        <section class="lesson-section lesson-soft section-pad">
+          <div class="lesson-split">
+            <article><p class="eyebrow">02 / 模組介紹</p><h2>LCD1602 I2C 是什麼？</h2><p>LCD1602 是每行 16 個字、共 2 行的字元型液晶顯示器。加上 I2C 背板後，原本需要許多平行控制線，現在主要只要使用 SDA、SCL、VCC 與 GND。</p><p>I2C 背板通常使用 PCF8574 I/O 擴充晶片，把 ESP32 的 I2C 指令轉成 LCD1602 可以理解的控制訊號。常見 I2C 位址是 <code>0x27</code>，另一部分模組會使用 <code>0x3F</code>。</p><p class="lesson-source">實際位址、供電與背光亮度會依模組版本不同；如果畫面完全沒有文字，第一個要檢查的就是 I2C 位址與對比度旋鈕。</p></article>
+            <div class="spec-grid"><div><b>16×2</b><span>每行 16 字、共 2 行</span></div><div><b>I2C</b><span>SDA／SCL 兩條資料線</span></div><div><b>0x27</b><span>最常見的模組位址</span></div><div><b>PCF8574</b><span>常見 I/O 擴充晶片</span></div><div><b>5V / 3.3V</b><span>依模組規格供電</span></div><div><b>1602</b><span>字元型液晶顯示器</span></div></div>
+          </div>
+        </section>
+
+        <section class="lesson-section section-pad">
+          <div class="lesson-split lesson-split-reverse">
+            <article><p class="eyebrow">03 / 開發平台</p><h2>NodeMCU-32S 腳位設定</h2><p>本教學使用 NodeMCU-32S，I2C 的預設腳位是 SDA＝GPIO21、SCL＝GPIO22。程式仍會明確呼叫 <code>Wire.begin(21, 22)</code>，讓接線與程式一眼就能對照。</p><p>第二個範例將 DHT11 的 DATA 接到 GPIO4。LCD 與 DHT11 必須和 NodeMCU-32S 共用 GND，否則資料可能讀取失敗或畫面不穩定。</p></article>
+            <div class="lesson-callout"><strong>本教學使用的腳位</strong><span>LCD SDA → GPIO21</span><span>LCD SCL → GPIO22</span><span>LCD VCC → 3V3（入門安全接法）</span><span>LCD GND → GND</span><span>DHT11 DATA → GPIO4</span></div>
+          </div>
+        </section>
+
+        <section class="lesson-section lesson-soft section-pad">
+          <div class="section-heading"><div><p class="eyebrow">04 / 接腳說明</p><h2>先認識兩個模組的接腳</h2></div></div>
+          <div class="pinout-grid">
+            <article><h3>LCD1602 I2C 背板</h3><p>背板上通常會標示四個接腳。不同廠牌的排列方向可能不同，請以板上的 VCC、GND、SDA、SCL 絲印為準。</p><div class="pin-badges"><b>GND</b><b>VCC</b><b>SDA</b><b>SCL</b></div><p>VCC 是電源、GND 是接地、SDA 傳送資料、SCL 提供 I2C 時脈。</p></article>
+            <article><h3>DHT11 三腳位模組</h3><p>本範例使用已焊接上拉電阻的三腳位 DHT11 模組，通常會標示 VCC、DATA、GND。若是四腳裸感測器，DATA 與 3.3V 之間需要另外加 4.7kΩ～10kΩ 上拉電阻。</p><div class="pin-badges"><b>VCC</b><b>DATA</b><b>GND</b></div><p>DHT11 建議至少間隔 1～2 秒讀取一次，不能在迴圈中高速連續讀取。</p></article>
+          </div>
+        </section>
+
+        <section class="lesson-section section-pad">
+          <div class="section-heading"><div><p class="eyebrow">05 / 接線圖一</p><h2>先讓 LCD 顯示 Hello</h2><p class="hero-text">第一階段只接 LCD1602 I2C，確認螢幕、I2C 腳位與函式庫都正常。</p></div></div>
+          <div class="wiring-reference-grid">
+            <figure class="wiring-diagram-card"><figcaption>LCD1602 I2C 與 NodeMCU-32S 的精確接線圖。</figcaption><svg class="pin-wiring-svg" viewBox="0 0 760 430" role="img" aria-labelledby="lcd-hello-title lcd-hello-desc"><title id="lcd-hello-title">LCD1602 I2C 顯示 Hello 接線圖</title><desc id="lcd-hello-desc">LCD1602 I2C 的 VCC 接 3V3，GND 接 GND，SDA 接 GPIO21，SCL 接 GPIO22。</desc><defs><marker id="lcd-red" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path d="M 0 0 L 10 5 L 0 10 z" fill="#d66f4f" /></marker><marker id="lcd-yellow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path d="M 0 0 L 10 5 L 0 10 z" fill="#c58e26" /></marker><marker id="lcd-blue" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path d="M 0 0 L 10 5 L 0 10 z" fill="#347aa1" /></marker><marker id="lcd-black" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path d="M 0 0 L 10 5 L 0 10 z" fill="#28352f" /></marker></defs><rect x="24" y="24" width="230" height="370" rx="18" fill="#f4f8f2" stroke="#d6e0d5" /><text x="139" y="62" text-anchor="middle" class="svg-title">LCD1602 I2C</text><rect x="59" y="94" width="160" height="126" rx="9" fill="#b88a4d" stroke="#704d28" stroke-width="3" /><rect x="81" y="115" width="116" height="65" rx="4" fill="#17321e" stroke="#304736" stroke-width="9" /><text x="139" y="141" text-anchor="middle" class="svg-subtitle" fill="#c8ee9c">Hello</text><text x="139" y="163" text-anchor="middle" class="svg-subtitle" fill="#c8ee9c">ESP32S + LCD</text><rect x="75" y="252" width="128" height="63" rx="8" fill="#2c8b80" stroke="#1a5c57" stroke-width="3" /><text x="139" y="279" text-anchor="middle" class="svg-chip svg-light">PCF8574</text><text x="139" y="299" text-anchor="middle" class="svg-subtitle svg-light">I2C BACKPACK</text><circle cx="69" cy="357" r="8" fill="#28352f" /><circle cx="116" cy="357" r="8" fill="#d66f4f" /><circle cx="163" cy="357" r="8" fill="#347aa1" /><circle cx="210" cy="357" r="8" fill="#c58e26" /><text x="69" y="382" text-anchor="middle" class="svg-pin">GND</text><text x="116" y="382" text-anchor="middle" class="svg-pin">VCC</text><text x="163" y="382" text-anchor="middle" class="svg-pin">SDA</text><text x="210" y="382" text-anchor="middle" class="svg-pin">SCL</text><rect x="506" y="24" width="230" height="370" rx="18" fill="#202d2b" stroke="#3e675a" /><text x="621" y="62" text-anchor="middle" class="svg-title svg-light">NodeMCU-32S</text><rect x="558" y="90" width="126" height="226" rx="11" fill="#111b1a" stroke="#81978d" stroke-width="2" /><rect x="590" y="135" width="62" height="76" rx="8" fill="#b8c0bc" /><text x="621" y="178" text-anchor="middle" class="svg-chip">ESP32</text><circle cx="536" cy="107" r="8" fill="#d66f4f" /><circle cx="536" cy="188" r="8" fill="#347aa1" /><circle cx="536" cy="269" r="8" fill="#c58e26" /><circle cx="700" cy="107" r="8" fill="#28352f" /><text x="555" y="112" class="svg-pin svg-light" text-anchor="end">3V3</text><text x="555" y="193" class="svg-pin svg-light" text-anchor="end">GPIO21</text><text x="555" y="274" class="svg-pin svg-light" text-anchor="end">GPIO22</text><text x="715" y="112" class="svg-pin svg-light">GND</text><path d="M116 357 C300 357, 350 107, 536 107" fill="none" stroke="#d66f4f" stroke-width="5" marker-end="url(#lcd-red)" /><path d="M163 357 C325 357, 370 188, 536 188" fill="none" stroke="#347aa1" stroke-width="5" marker-end="url(#lcd-blue)" /><path d="M210 357 C350 357, 394 269, 536 269" fill="none" stroke="#c58e26" stroke-width="5" marker-end="url(#lcd-yellow)" /><path d="M69 357 C420 357, 440 107, 700 107" fill="none" stroke="#28352f" stroke-width="5" marker-end="url(#lcd-black)" /><rect x="292" y="80" width="169" height="29" rx="14" fill="#fff5ef" /><text x="376" y="100" text-anchor="middle" class="svg-label svg-red">VCC → 3V3</text><rect x="292" y="171" width="169" height="29" rx="14" fill="#edf7ff" /><text x="376" y="191" text-anchor="middle" class="svg-label" fill="#347aa1">SDA → GPIO21</text><rect x="292" y="252" width="169" height="29" rx="14" fill="#fff8df" /><text x="376" y="272" text-anchor="middle" class="svg-label svg-yellow">SCL → GPIO22</text><rect x="292" y="323" width="169" height="29" rx="14" fill="#eef2ef" /><text x="376" y="343" text-anchor="middle" class="svg-label svg-black">GND → GND</text></svg></figure>
+            <div class="wiring-details"><article><h3>LCD1602 I2C → NodeMCU-32S</h3><div class="wiring-table"><div><b>LCD1602 I2C</b><b>NodeMCU-32S</b></div><div><span>VCC</span><span>3V3</span></div><div><span>GND</span><span>GND</span></div><div><span>SDA</span><span>GPIO21</span></div><div><span>SCL</span><span>GPIO22</span></div></div><div class="warning-box"><strong>供電安全提醒</strong><p>部分 LCD1602 背板習慣接 5V，但背板上的 I2C 上拉電阻也可能把 SDA、SCL 拉到 5V。ESP32 GPIO 不耐受 5V。入門時先依模組狀況嘗試 3.3V；若必須使用 5V，請在 SDA／SCL 之間加入雙向邏輯電位轉換器。</p></div></article></div>
+          </div>
+        </section>
+
+        <section class="lesson-section lesson-dark section-pad">
+          <div class="section-heading"><div><p class="eyebrow">06 / 函式庫</p><h2>在 Arduino IDE 安裝 LiquidCrystal_I2C</h2></div></div>
+          <div class="install-steps"><div><b>01</b><p>開啟 Arduino IDE，選擇「工具 → 管理程式庫」。</p></div><div><b>02</b><p>搜尋 <code>LiquidCrystal I2C</code>，安裝常見的 LiquidCrystal_I2C 函式庫。</p></div><div><b>03</b><p>第二個範例再搜尋並安裝 <code>DHT sensor library</code> 與 <code>Adafruit Unified Sensor</code>。</p></div><div><b>04</b><p>開發板選擇 NodeMCU-32S，連接埠選擇對應的 ESP32 COM Port。</p></div></div>
+          <p class="lesson-source">不同 LiquidCrystal_I2C 函式庫的初始化函式可能略有差異；本頁程式使用最常見的 <code>lcd.init()</code> 與 <code>lcd.backlight()</code> 寫法。</p>
+        </section>
+
+        <section class="lesson-section section-pad">
+          <div class="section-heading"><div><p class="eyebrow">07 / 第一個範例</p><h2>先顯示 Hello</h2><p class="hero-text">這個版本只測試 LCD，不接 DHT11。確認畫面能顯示後，再進入下一個完整的溫濕度範例。</p></div></div>
+          <div class="code-block-wrap"><div class="code-block-toolbar"><span>Arduino / LCD1602 I2C / Hello</span><button class="copy-code-button" type="button" data-copy-target="lcd-hello-code" aria-label="複製 LCD Hello 範例程式">複製程式碼</button></div><pre class="lesson-code"><code id="lcd-hello-code">#include &lt;Wire.h&gt;
+#include &lt;LiquidCrystal_I2C.h&gt;
+
+// 常見 I2C 位址是 0x27；若無法顯示，可改試 0x3F
+#define LCD_ADDRESS 0x27
+#define LCD_COLUMNS 16
+#define LCD_ROWS 2
+
+LiquidCrystal_I2C lcd(LCD_ADDRESS, LCD_COLUMNS, LCD_ROWS);
+
+void setup() {
+  // NodeMCU-32S：SDA = GPIO21，SCL = GPIO22
+  Wire.begin(21, 22);
+
+  lcd.init();
+  lcd.backlight();
+  lcd.clear();
+
+  lcd.setCursor(0, 0);
+  lcd.print("Hello");
+  lcd.setCursor(0, 1);
+  lcd.print("ESP32S + LCD");
+}
+
+void loop() {
+  // Hello 範例不需要重複更新
+}</code></pre></div>
+          <div class="lesson-explain"><p><code>LiquidCrystal_I2C lcd(0x27, 16, 2)</code> 建立一個 16 欄、2 列的 LCD 物件；如果你的背板位址是 0x3F，請把 0x27 改成 0x3F。</p><p><code>setCursor(欄, 列)</code> 的欄與列從 0 開始。<code>setCursor(0, 0)</code> 是左上角，<code>setCursor(0, 1)</code> 是第二行左側。</p></div>
+        </section>
+
+        <section class="lesson-section lesson-soft section-pad">
+          <div class="lesson-split"><article><p class="eyebrow">08 / 空白畫面排除</p><h2>如果 Hello 沒有出現</h2><p>先確認 LCD 背板上的對比度旋鈕。螢幕有背光但沒有字，常常只是對比度太低或太高。接著確認 SDA、SCL 沒有接反，並檢查程式中的 I2C 位址。</p><p>若仍找不到位址，可以先執行 I2C Scanner。序列埠監控視窗若顯示 <code>0x27</code> 或 <code>0x3F</code>，就把那個位址填回完整範例。</p><pre class="serial-output">I2C device found at address 0x27
+I2C scan complete</pre></article><div class="lesson-callout"><strong>快速檢查</strong><span>□ LCD 背光有亮</span><span>□ 對比度旋鈕已調整</span><span>□ SDA → GPIO21</span><span>□ SCL → GPIO22</span><span>□ 程式位址與掃描結果相同</span><span>□ ESP32 與 LCD 共用 GND</span></div></div>
+        </section>
+
+        <section class="lesson-section section-pad">
+          <div class="section-heading"><div><p class="eyebrow">09 / 接線圖二</p><h2>LCD 加上 DHT11 溫濕度</h2><p class="hero-text">LCD 保持 I2C 四條線，DHT11 再增加 VCC、DATA、GND 三條線。兩個模組共用 3V3 與 GND。</p></div></div>
+          <div class="wiring-reference-grid">
+            <figure class="wiring-diagram-card"><figcaption>NodeMCU-32S、LCD1602 I2C 與 DHT11 的完整接線圖。</figcaption><svg class="pin-wiring-svg" viewBox="0 0 820 520" role="img" aria-labelledby="lcd-dht-title lcd-dht-desc"><title id="lcd-dht-title">LCD1602 I2C 與 DHT11 完整接線圖</title><desc id="lcd-dht-desc">LCD1602 I2C 的 SDA 接 GPIO21、SCL 接 GPIO22，DHT11 DATA 接 GPIO4，兩個模組的 VCC 接 3V3、GND 接 GND。</desc><defs><marker id="combo-red" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path d="M 0 0 L 10 5 L 0 10 z" fill="#d66f4f" /></marker><marker id="combo-yellow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path d="M 0 0 L 10 5 L 0 10 z" fill="#c58e26" /></marker><marker id="combo-blue" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path d="M 0 0 L 10 5 L 0 10 z" fill="#347aa1" /></marker><marker id="combo-purple" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path d="M 0 0 L 10 5 L 0 10 z" fill="#815b91" /></marker><marker id="combo-black" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path d="M 0 0 L 10 5 L 0 10 z" fill="#28352f" /></marker></defs><rect x="20" y="24" width="210" height="192" rx="17" fill="#f4f8f2" stroke="#d6e0d5" /><text x="125" y="58" text-anchor="middle" class="svg-title">LCD1602 I2C</text><rect x="62" y="83" width="126" height="73" rx="7" fill="#b88a4d" stroke="#704d28" stroke-width="3" /><rect x="78" y="99" width="94" height="37" rx="3" fill="#17321e" stroke="#304736" stroke-width="6" /><text x="125" y="123" text-anchor="middle" class="svg-subtitle" fill="#c8ee9c">Hello</text><text x="125" y="184" text-anchor="middle" class="svg-subtitle">I2C 背板</text><rect x="20" y="270" width="210" height="190" rx="17" fill="#f4f8f2" stroke="#d6e0d5" /><text x="125" y="304" text-anchor="middle" class="svg-title">DHT11</text><rect x="78" y="328" width="94" height="75" rx="9" fill="#20a9df" stroke="#147aa9" stroke-width="3" /><path d="M90 346h70M90 365h70M90 384h70" stroke="#bceaff" stroke-width="7" stroke-linecap="round" /><text x="125" y="433" text-anchor="middle" class="svg-subtitle">三腳位模組</text><rect x="580" y="24" width="220" height="436" rx="18" fill="#202d2b" stroke="#3e675a" /><text x="690" y="59" text-anchor="middle" class="svg-title svg-light">NodeMCU-32S</text><rect x="635" y="93" width="110" height="270" rx="11" fill="#111b1a" stroke="#81978d" stroke-width="2" /><rect x="665" y="154" width="50" height="67" rx="8" fill="#b8c0bc" /><text x="690" y="193" text-anchor="middle" class="svg-chip">ESP32</text><circle cx="559" cy="104" r="8" fill="#d66f4f" /><circle cx="559" cy="174" r="8" fill="#28352f" /><circle cx="559" cy="244" r="8" fill="#347aa1" /><circle cx="559" cy="314" r="8" fill="#c58e26" /><circle cx="559" cy="384" r="8" fill="#815b91" /><text x="578" y="109" class="svg-pin svg-light" text-anchor="end">3V3</text><text x="578" y="179" class="svg-pin svg-light" text-anchor="end">GND</text><text x="578" y="249" class="svg-pin svg-light" text-anchor="end">GPIO21 SDA</text><text x="578" y="319" class="svg-pin svg-light" text-anchor="end">GPIO22 SCL</text><text x="578" y="389" class="svg-pin svg-light" text-anchor="end">GPIO4</text><path d="M104 156 C300 156, 336 104, 559 104" fill="none" stroke="#d66f4f" stroke-width="5" marker-end="url(#combo-red)" /><path d="M104 328 C304 328, 347 104, 559 104" fill="none" stroke="#d66f4f" stroke-width="5" marker-end="url(#combo-red)" /><path d="M116 184 C300 184, 355 174, 559 174" fill="none" stroke="#28352f" stroke-width="5" marker-end="url(#combo-black)" /><path d="M116 433 C327 433, 389 174, 559 174" fill="none" stroke="#28352f" stroke-width="5" marker-end="url(#combo-black)" /><path d="M146 156 C326 156, 375 244, 559 244" fill="none" stroke="#347aa1" stroke-width="5" marker-end="url(#combo-blue)" /><path d="M158 184 C355 184, 408 314, 559 314" fill="none" stroke="#c58e26" stroke-width="5" marker-end="url(#combo-yellow)" /><path d="M146 403 C365 403, 430 384, 559 384" fill="none" stroke="#815b91" stroke-width="5" marker-end="url(#combo-purple)" /><rect x="300" y="75" width="185" height="27" rx="13" fill="#fff5ef" /><text x="392" y="94" text-anchor="middle" class="svg-label svg-red">LCD VCC + DHT VCC → 3V3</text><rect x="302" y="162" width="160" height="27" rx="13" fill="#eef2ef" /><text x="382" y="181" text-anchor="middle" class="svg-label svg-black">兩個 GND 共地</text><rect x="301" y="230" width="160" height="27" rx="13" fill="#edf7ff" /><text x="381" y="249" text-anchor="middle" class="svg-label" fill="#347aa1">SDA → GPIO21</text><rect x="301" y="300" width="160" height="27" rx="13" fill="#fff8df" /><text x="381" y="319" text-anchor="middle" class="svg-label svg-yellow">SCL → GPIO22</text><rect x="302" y="371" width="160" height="27" rx="13" fill="#f6edfa" /><text x="382" y="390" text-anchor="middle" class="svg-label" fill="#815b91">DATA → GPIO4</text></svg></figure>
+            <div class="wiring-details"><article><h3>完整接線表</h3><div class="wiring-table"><div><b>模組腳位</b><b>NodeMCU-32S</b></div><div><span>LCD VCC</span><span>3V3</span></div><div><span>LCD GND</span><span>GND</span></div><div><span>LCD SDA</span><span>GPIO21</span></div><div><span>LCD SCL</span><span>GPIO22</span></div><div><span>DHT11 VCC</span><span>3V3</span></div><div><span>DHT11 DATA</span><span>GPIO4</span></div><div><span>DHT11 GND</span><span>GND</span></div></div><div class="warning-box"><strong>請先確認電壓</strong><p>如果你的 LCD1602 背板只能使用 5V，請加雙向電位轉換器後再連接 SDA、SCL；不要把 5V I2C 訊號直接送進 ESP32 GPIO。</p></div></article></div>
+          </div>
+        </section>
+
+        <section class="lesson-section section-pad">
+          <div class="section-heading"><div><p class="eyebrow">10 / 完整範例</p><h2>顯示目前溫度與濕度</h2><p class="hero-text">這個程式同時使用 I2C LCD1602 與 DHT11。每兩秒讀取一次 DHT11，並把資料更新到 LCD 與序列埠監控視窗。</p></div></div>
+          <div class="code-block-wrap"><div class="code-block-toolbar"><span>Arduino / LCD1602 I2C + DHT11</span><button class="copy-code-button" type="button" data-copy-target="lcd-dht11-code" aria-label="複製 LCD 與 DHT11 完整程式">複製程式碼</button></div><pre class="lesson-code"><code id="lcd-dht11-code">#include &lt;Wire.h&gt;
+#include &lt;LiquidCrystal_I2C.h&gt;
+#include &lt;DHT.h&gt;
+
+#define SDA_PIN 21
+#define SCL_PIN 22
+#define DHT_PIN 4
+#define DHT_TYPE DHT11
+#define LCD_ADDRESS 0x27   // 無畫面時可改試 0x3F
+
+LiquidCrystal_I2C lcd(LCD_ADDRESS, 16, 2);
+DHT dht(DHT_PIN, DHT_TYPE);
+
+void setup() {
+  Serial.begin(115200);
+
+  // NodeMCU-32S 的 I2C 腳位
+  Wire.begin(SDA_PIN, SCL_PIN);
+
+  lcd.init();
+  lcd.backlight();
+  lcd.clear();
+
+  dht.begin();
+
+  lcd.setCursor(0, 0);
+  lcd.print("ESP32S + DHT11");
+  lcd.setCursor(0, 1);
+  lcd.print("Starting...");
+  delay(1500);
+}
+
+void loop() {
+  // DHT11 不適合高速連續讀取，至少間隔 1～2 秒
+  float humidity = dht.readHumidity();
+  float temperature = dht.readTemperature();
+
+  if (isnan(humidity) || isnan(temperature)) {
+    Serial.println("DHT11 讀取失敗，請檢查接線！");
+    lcd.clear();
+    lcd.setCursor(0, 0);
+    lcd.print("DHT11 Error");
+    lcd.setCursor(0, 1);
+    lcd.print("Check wiring");
+  } else {
+    Serial.print("Temperature: ");
+    Serial.print(temperature, 1);
+    Serial.print(" C | Humidity: ");
+    Serial.print(humidity, 1);
+    Serial.println(" %");
+
+    lcd.clear();
+    lcd.setCursor(0, 0);
+    lcd.print("T:");
+    lcd.print(temperature, 1);
+    lcd.write(byte(223));  // LCD 的度數符號
+    lcd.print("C H:");
+    lcd.print(humidity, 1);
+    lcd.print("%");
+
+    lcd.setCursor(0, 1);
+    lcd.print("NodeMCU-32S");
+  }
+
+  delay(2000);
+}</code></pre></div>
+          <div class="lesson-explain"><p><code>Wire.begin(21, 22)</code> 指定 I2C 的 SDA 與 SCL。<code>DHT dht(4, DHT11)</code> 則表示 DHT11 DATA 接在 GPIO4。</p><p>如果 LCD 沒有畫面，先掃描 I2C 位址，再修改 <code>LCD_ADDRESS</code>。如果 LCD 正常但出現 DHT11 Error，請優先檢查 DATA、VCC、GND 與函式庫是否安裝完成。</p></div>
+        </section>
+
+        <section class="lesson-section lesson-soft section-pad">
+          <div class="lesson-split lesson-split-reverse"><article><p class="eyebrow">11 / 觀察結果</p><h2>LCD 與序列埠會看到什麼？</h2><p>上傳程式後，開啟 Arduino IDE 的序列埠監控視窗，鮑率設定為 115200。LCD 第一行會顯示溫度與濕度，第二行顯示目前使用的開發板。</p><pre class="serial-output">Temperature: 25.0 C | Humidity: 62.0 %
+Temperature: 25.0 C | Humidity: 63.0 %</pre><p>DHT11 的解析度通常是 1°C 與 1%RH，因此畫面上的小數常常會是 .0；這不是 LCD 的問題，而是感測器本身的解析度限制。</p></article><div class="lesson-callout"><strong>LCD 預期畫面</strong><span>T:25.0°C H:62.0%</span><span>NodeMCU-32S</span><strong>序列埠設定</strong><span>鮑率：115200</span><span>換行：依預設即可</span></div></div>
+        </section>
+
+        <section class="lesson-section section-pad">
+          <div class="section-heading"><div><p class="eyebrow">12 / 問題排除</p><h2>常見問題與排除方法</h2></div></div>
+          <div class="troubleshooting-grid"><article><h3>LCD 背光亮但沒有文字</h3><p>調整背板上的對比度旋鈕；再確認 LCD 位址是 0x27 還是 0x3F，並確認 SDA、SCL 沒有接反。</p></article><article><h3>畫面出現亂碼</h3><p>檢查供電是否穩定、GND 是否共地，並確認程式的欄數與列數是 16、2。使用 5V LCD 時，請處理 I2C 電位相容問題。</p></article><article><h3>DHT11 顯示 Error</h3><p>確認 DHT11 DATA 接 GPIO4、VCC 接 3V3、GND 共地；檢查 DHT sensor library 與 Adafruit Unified Sensor 是否都已安裝。</p></article><article><h3>數值更新很慢</h3><p>DHT11 本身不適合快速取樣，本範例每兩秒更新一次是正常的。需要更快或更精準時，可改用 DHT22、AHT20 或 BME280。</p></article><article><h3>LCD 顯示超出範圍</h3><p>每一行最多 16 個字元。若文字太長，請縮短字串，或使用 <code>lcd.setCursor()</code> 分行顯示。</p></article><article><h3>上傳程式失敗</h3><p>確認已選 NodeMCU-32S、正確的 COM Port，必要時按住 BOOT 鍵直到 Arduino IDE 開始上傳。</p></article></div>
+        </section>
+
+        <section class="lesson-section lesson-dark section-pad">
+          <div class="section-heading"><div><p class="eyebrow">13 / 使用情境</p><h2>把顯示器變成小型儀表板</h2></div></div>
+          <div class="scenario-grid"><article><span>01</span><h3>教室環境監測</h3><p>將 LCD 放在教室或實驗桌上，直接顯示目前溫度與濕度，適合做入門物聯網展示。</p></article><article><span>02</span><h3>機箱狀態顯示</h3><p>顯示系統啟動狀態、Wi‑Fi 連線結果、感測值或錯誤訊息，讓使用者不用開電腦也能查看。</p></article><article><span>03</span><h3>倒數與提醒器</h3><p>利用 LCD 顯示倒數時間，在時間到達或溫度超過門檻時搭配蜂鳴器提醒。</p></article><article><span>04</span><h3>Wi‑Fi 儀表板前端</h3><p>ESP32 將資料上傳到網路服務，同時在 LCD 保留本地端即時顯示，形成雙重資訊介面。</p></article></div>
+        </section>
+
+        <section class="lesson-summary section-pad"><p class="eyebrow">重點整理</p><h2>LCD1602 I2C × NodeMCU-32S</h2><pre class="summary-wiring">LCD VCC       → NodeMCU-32S 3V3
+LCD GND       → NodeMCU-32S GND
+LCD SDA       → NodeMCU-32S GPIO21
+LCD SCL       → NodeMCU-32S GPIO22
+DHT11 VCC     → NodeMCU-32S 3V3
+DHT11 DATA    → NodeMCU-32S GPIO4
+DHT11 GND     → NodeMCU-32S GND</pre><p>第一個範例先確認 LCD 位址、對比度與 I2C 接線；第二個範例再加入 DHT11 與兩秒一次的溫濕度更新。實際接線時請以模組絲印與電壓規格為準，尤其不要讓 5V I2C 訊號直接進入 ESP32 GPIO。</p><p><a class="button button-primary" href="../modules.html">← 回到模組索引</a></p></section>
+      </main>
+
+      <footer class="footer section-pad"><div><strong>ESP32 實作學習站</strong><span>LCD1602 I2C × NodeMCU-32S 完整教學</span></div><p><a href="../modules.html">← 回到模組索引</a></p></footer>
+    </div>
+    <script src="../app.js"></script>
+  </body>
+</html>

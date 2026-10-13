@@ -154,21 +154,24 @@ const sensorPageLinks = [
   "./sensor-pages/max30102.html"
 ];
 
-document.querySelectorAll(".catalog-card").forEach((card, index) => {
-  const heading = card.querySelector("h3");
-  const href = sensorPageLinks[index];
-  if (!heading || !href) return;
-  const existingLink = heading.querySelector("a");
-  if (existingLink) {
-    existingLink.href = href;
-    return;
-  }
-  const link = document.createElement("a");
-  link.className = "catalog-card-link";
-  link.href = href;
-  link.textContent = heading.textContent;
-  heading.replaceChildren(link);
-});
+const isSensorCatalogPage = /(?:^|\/)sensors\.html$/.test(location.pathname);
+if (isSensorCatalogPage) {
+  document.querySelectorAll(".catalog-card").forEach((card, index) => {
+    const heading = card.querySelector("h3");
+    const href = sensorPageLinks[index];
+    if (!heading || !href) return;
+    const existingLink = heading.querySelector("a");
+    if (existingLink) {
+      existingLink.href = href;
+      return;
+    }
+    const link = document.createElement("a");
+    link.className = "catalog-card-link";
+    link.href = href;
+    link.textContent = heading.textContent;
+    heading.replaceChildren(link);
+  });
+}
 
 const codePhotos = Array.from({ length: 6 }, (_, index) => photoCell("./assets/code-photo-scenes.png", 3, 2, index, "photo-code-scenes"));
 document.querySelectorAll(".code-topic").forEach((topic, index) => addPhotoVisual(topic, codePhotos[index]));
