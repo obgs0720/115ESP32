@@ -1,0 +1,130 @@
+<!doctype html>
+<html lang="zh-Hant">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="description" content="ESP32 使用 DHT11 讀取溫溼度並透過 Wi-Fi 網頁顯示教學。" />
+  <title>DHT11 Wi-Fi 溫溼度監測｜ESP32 專題實驗室</title>
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <header class="site-header"><a class="brand" href="index.html">ESP32 <span>專題實驗室</span></a><nav aria-label="主要選單"><a href="index.html">所有單元</a><a href="#code">完整程式</a></nav></header>
+  <main>
+    <section class="lesson-hero sensor-hero"><a class="back-button" href="index.html">回到所有單元</a><p class="eyebrow">單元 03・無線網路應用</p><h1>DHT11 溫溼度 Wi-Fi 監測</h1><p>溫度與濕度同步顯示在 16×2 LCD 和手機網頁；Wi-Fi 連線成功時顯示 OK。</p></section>
+    <section class="lesson-section materials"><p class="eyebrow">步驟 1・準備材料</p><h2>所需材料與函式庫</h2><div class="materials-grid"><div><b>ESP32＋擴充板</b><span>各 × 1</span></div><div><b>DHT11</b><span>三腳感應器模組 × 1</span></div><div><b>16×2 I2C LCD</b><span>含 I2C 背板 × 1</span></div><div><b>Wi-Fi 網路</b><span>手機與 ESP32 使用同一網路</span></div></div></section>
+    <section class="lesson-section wiring-section"><p class="eyebrow">步驟 2・接線</p><h2>DHT11、LCD 與 Wi-Fi</h2><div class="two-wiring"><div class="connection-card"><h3>DHT11 三腳模組</h3><p><i class="red-dot"></i><b>VCC</b> → 擴充板 3.3V 正電源軌</p><p><i class="green-dot"></i><b>GND</b> → 擴充板 GND 負電源軌</p><p><i class="yellow-dot"></i><b>DATA</b> → ESP32 GPIO 4</p></div><div class="connection-card"><h3>16×2 I2C LCD 背板</h3><p><i class="red-dot"></i><b>VCC</b> → 擴充板 3.3V 正電源軌</p><p><i class="green-dot"></i><b>GND</b> → 擴充板 GND 負電源軌</p><p><i class="yellow-dot"></i><b>SDA</b> → ESP32 GPIO 21</p><p><i class="yellow-dot"></i><b>SCL</b> → ESP32 GPIO 22</p></div></div><aside><b>注意：</b>確認擴充板電源軌與 LCD 背板規格。ESP32 的 GPIO 不耐 5V；若 LCD 使用 5V 且 I2C 訊號被上拉至 5V，需加雙向電平轉換器。Wi-Fi 使用 2.4 GHz。</aside></section>
+    <section id="code" class="lesson-section"><p class="eyebrow">步驟 3・上傳程式</p><h2>完整 Arduino 程式碼</h2><p class="wide-text">在 Arduino IDE 的程式庫管理員安裝下列函式庫，再填入自己的 Wi-Fi 名稱與密碼。</p><ul class="library-list"><li><b>DHT sensor library</b><span>作者：Adafruit</span></li><li><b>Adafruit Unified Sensor</b><span>作者：Adafruit</span></li><li><b>hd44780</b><span>作者：Bill Perry</span></li></ul><div class="code-box"><button id="copyCode" type="button">複製程式碼</button><pre><code id="arduinoCode">#include &lt;WiFi.h&gt;
+#include &lt;WebServer.h&gt;
+#include &lt;DHT.h&gt;
+#include &lt;Wire.h&gt;
+#include &lt;hd44780.h&gt;
+#include &lt;hd44780ioClass/hd44780_I2Cexp.h&gt;
+
+// 請填入自己的 2.4 GHz Wi-Fi 名稱與密碼
+const char* WIFI_SSID = "你的WiFi名稱";
+const char* WIFI_PASSWORD = "你的WiFi密碼";
+
+#define DHTPIN 4
+#define DHTTYPE DHT11
+DHT dht(DHTPIN, DHTTYPE);
+WebServer server(80);
+hd44780_I2Cexp lcd;
+float currentHumidity = NAN;
+float currentTemperature = NAN;
+unsigned long lastReadTime = 0;
+
+void updateSensorAndLCD() {
+  if (millis() - lastReadTime &lt; 2000 &amp;&amp; lastReadTime != 0) return;
+  lastReadTime = millis();
+  currentHumidity = dht.readHumidity();
+  currentTemperature = dht.readTemperature();
+
+  if (isnan(currentHumidity) || isnan(currentTemperature)) {
+    lcd.setCursor(0, 0);
+    lcd.print("DHT11 Read Error");
+    lcd.setCursor(0, 1);
+    lcd.print("Check Sensor    ");
+    return;
+  }
+
+  // 第一行顯示 Wi-Fi 狀態 OK 和溫度，第二行顯示濕度
+  lcd.setCursor(0, 0);
+  lcd.print("OK T:");
+  lcd.print(currentTemperature, 1);
+  lcd.print((char)223);
+  lcd.print("C     ");
+  lcd.setCursor(0, 1);
+  lcd.print("H:");
+  lcd.print(currentHumidity, 1);
+  lcd.print("%             ");
+}
+
+void handleRoot() {
+  updateSensorAndLCD();
+
+  String page = "&lt;!doctype html&gt;&lt;html lang='zh-Hant'&gt;";
+  page += "&lt;meta name='viewport' content='width=device-width,initial-scale=1'&gt;";
+  page += "&lt;meta http-equiv='refresh' content='5'&gt;";
+  page += "&lt;title&gt;ESP32 溫溼度&lt;/title&gt;";
+  page += "&lt;body style='font-family:sans-serif;text-align:center;background:#f1f5fb;padding:2rem'&gt;";
+  page += "&lt;h1&gt;ESP32 溫溼度監測&lt;/h1&gt;";
+
+  if (isnan(currentHumidity) || isnan(currentTemperature)) {
+    page += "&lt;p&gt;感應器讀取失敗，請檢查 DHT11 接線。&lt;/p&gt;";
+  } else {
+    page += "&lt;h2&gt;溫度：" + String(currentTemperature, 1) + " °C&lt;/h2&gt;";
+    page += "&lt;h2&gt;濕度：" + String(currentHumidity, 1) + " %&lt;/h2&gt;";
+  }
+
+  page += "&lt;p&gt;每 5 秒自動更新&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;";
+  server.send(200, "text/html; charset=utf-8", page);
+}
+
+void setup() {
+  Serial.begin(115200);
+  dht.begin();
+
+  Wire.begin(21, 22);
+  int lcdStatus = lcd.begin(16, 2);
+  if (lcdStatus) {
+    Serial.print("LCD 初始化失敗，錯誤碼：");
+    Serial.println(lcdStatus);
+  } else {
+    lcd.backlight();
+    lcd.setCursor(0, 0);
+    lcd.print("WiFi Connecting");
+    lcd.setCursor(0, 1);
+    lcd.print("Please wait...");
+  }
+
+  WiFi.mode(WIFI_STA);
+  WiFi.begin(WIFI_SSID, WIFI_PASSWORD);
+  Serial.print("連線到 Wi-Fi");
+
+  while (WiFi.status() != WL_CONNECTED) {
+    delay(500);
+    Serial.print(".");
+  }
+
+  Serial.println();
+  Serial.print("已連線，請在同一 Wi-Fi 的瀏覽器開啟：http://");
+  Serial.println(WiFi.localIP());
+
+  updateSensorAndLCD();
+
+  server.on("/", handleRoot);
+  server.begin();
+  Serial.println("網頁伺服器已啟動");
+}
+
+void loop() {
+  updateSensorAndLCD();
+  server.handleClient();
+}</code></pre></div></section>
+    <section class="lesson-section troubleshoot"><p class="eyebrow">步驟 4・查看溫溼度</p><h2>LCD 與手機網頁同步顯示</h2><ol class="wifi-steps"><li>修改程式中的 Wi-Fi 名稱與密碼，編譯並上傳。</li><li>Wi-Fi 連線成功後，LCD 第一行會出現 <code>OK</code> 和溫度，第二行顯示濕度。</li><li>開啟序列監控視窗（115200），查看 ESP32 的 IP 位址。</li><li>手機連上同一個 Wi-Fi，在瀏覽器輸入該 IP，即可查看溫度與濕度。</li></ol><details><summary>LCD 顯示初始化失敗時</summary><p>確認已安裝作者 Bill Perry 的 hd44780，並檢查 SDA → GPIO 21、SCL → GPIO 22；可執行 hd44780_I2Cexp 範例中的 I2CexpDiag 診斷。</p></details><details><summary>Wi-Fi 連不上時</summary><p>確認使用 2.4 GHz Wi-Fi、SSID 與密碼正確。Wi-Fi 連線成功前 LCD 會顯示 WiFi Connecting；連線成功後才會顯示 OK。</p></details><details><summary>DHT11 讀取失敗時</summary><p>確認 VCC 接 3.3V 電源軌、GND 接負電源軌、DATA 接 GPIO 4。若使用裸感測器而非模組，DATA 需加上拉電阻。</p></details><div class="page-bottom-action"><a class="primary-button" href="index.html">回到首頁</a></div></section>
+  </main>
+  <div id="toast" role="status" aria-live="polite"></div><footer>ESP32 專題實驗室・每完成一個小作品，就多一項能力</footer>
+  <script src="dht11-wifi.js"></script>
+</body>
+</html>
+

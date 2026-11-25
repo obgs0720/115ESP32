@@ -1,0 +1,39 @@
+<!doctype html>
+<html lang="zh-Hant">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="description" content="ESP32 專題實驗室：感應器與智慧裝置教學單元。" />
+  <title>ESP32 專題實驗室</title>
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <header class="site-header">
+    <a class="brand" href="index.html">ESP32 <span>專題實驗室</span></a>
+    <nav aria-label="主要選單"><a href="#units">所有單元</a><a href="traffic-light.html">開始實作</a></nav>
+  </header>
+  <main>
+    <section class="home-hero" aria-labelledby="homeTitle">
+      <p class="eyebrow">動手做，才能真的學會</p>
+      <h1 id="homeTitle">ESP32 專題學習地圖</h1>
+      <p>從 LED 到感應器，動手完成每個 ESP32 專案。</p>
+    </section>
+    <section id="units" class="unit-list" aria-labelledby="unitTitle">
+      <div class="section-heading"><div><p class="eyebrow">專案單元</p><h2 id="unitTitle">選擇一個專題開始</h2></div><p>每個單元都是獨立網頁，日後方便新增與維護。</p></div>
+      <div class="unit-grid">
+        <article class="unit-card featured">
+          <div class="card-light" aria-hidden="true"><i class="red on"></i><i class="yellow"></i><i class="green"></i></div>
+          <div class="tag">已開放・單元 01</div><h3>紅綠燈 LED</h3><p>用三顆 LED 學會 ESP32 的數位輸出、延遲與循環控制。</p>
+          <ul><li>材料與接線圖</li><li>Arduino 完整程式</li><li>網頁循環模擬器</li></ul>
+          <a class="primary-button" href="traffic-light.html">進入這個單元</a>
+        </article>
+        <article class="unit-card featured sensor-card"><div class="sensor-icon">℃</div><div class="tag">已開放・單元 02</div><h3>溫溼度感應器</h3><p>讀取 DHT11 的溫度與濕度，顯示在 16×2 I2C LCD。</p><ul><li>DHT11 與 LCD 接線</li><li>完整 Arduino 程式</li><li>LCD 位址與故障排查</li></ul><a class="primary-button" href="dht11-lcd.html">進入這個單元</a></article>
+        <article class="unit-card future"><div class="future-icon">◉</div><div class="tag">規劃中</div><h3>超音波測距</h3><p>利用距離感應器，做出停車偵測或防撞提示。</p><span>即將加入</span></article>
+        <article class="unit-card featured sensor-card"><div class="sensor-icon">Wi‑Fi</div><div class="tag">已開放・單元 03</div><h3>DHT11 溫溼度 Wi‑Fi 連線</h3><p>讓 ESP32 連上無線網路，用手機或電腦瀏覽器查看溫度與濕度。</p><ul><li>Wi‑Fi 與 DHT11 接線</li><li>完整網頁伺服器程式</li><li>手機即時查看數值</li></ul><a class="primary-button" href="dht11-wifi.html">進入這個單元</a></article>
+      </div>
+    </section>
+  </main>
+  <footer>ESP32 專題實驗室・每完成一個小作品，就多一項能力</footer>
+</body>
+</html>
+

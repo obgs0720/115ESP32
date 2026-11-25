@@ -1,0 +1,130 @@
+<!doctype html>
+<html lang="zh-Hant">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="description" content="ESP32 DHT11 溫溼度感應器與 16×2 I2C LCD 教學。" />
+  <title>DHT11 溫溼度顯示｜ESP32 專題實驗室</title>
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <header class="site-header"><a class="brand" href="index.html">ESP32 <span>專題實驗室</span></a><nav aria-label="主要選單"><a href="index.html">所有單元</a><a href="#code">完整程式</a></nav></header>
+  <main>
+    <section class="lesson-hero sensor-hero" aria-labelledby="lessonTitle"><a class="back-button" href="index.html">回到所有單元</a><p class="eyebrow">單元 02・環境感測入門</p><h1 id="lessonTitle">DHT11 溫溼度感測</h1><p>副標題：使用 16×2 I2C LCD 即時顯示環境溫度與濕度。</p></section>
+    <section class="lesson-section materials"><p class="eyebrow">步驟 1・準備材料</p><h2>四個主要元件</h2><div class="materials-grid"><div><b>ESP32</b><span>開發板 × 1</span></div><div><b>擴充板</b><span>ESP32 麵包板擴充底板 × 1</span></div><div><b>DHT11</b><span>三腳模組 × 1</span></div><div><b>16×2 LCD</b><span>含 I2C 背板 × 1</span></div></div></section>
+    <section class="lesson-section wiring-section sensor-wiring"><p class="eyebrow">步驟 2・安全接線</p><h2>電源接擴充板，訊號接 GPIO</h2><p class="wide-text">ESP32 插在擴充板上。DHT11 與 LCD 的 VCC、GND 分別接擴充板旁的正（+）與負（−）電源軌；DATA、SDA、SCL 訊號線才接 ESP32 的 GPIO。</p><div class="two-wiring"><div class="connection-card"><h3>DHT11 溫溼度感應器</h3><p><i class="red-dot"></i><b>VCC</b> → 擴充板 + 正電源軌</p><p><i class="green-dot"></i><b>GND</b> → 擴充板 − 負電源軌</p><p><i class="yellow-dot"></i><b>DATA</b> → ESP32 GPIO 4</p><small>三腳 DHT11 模組通常已內建上拉電阻。</small></div><div class="connection-card"><h3>16×2 I2C LCD 背板</h3><p><i class="red-dot"></i><b>VCC</b> → 擴充板 + 正電源軌</p><p><i class="green-dot"></i><b>GND</b> → 擴充板 − 負電源軌</p><p><i class="yellow-dot"></i><b>SDA</b> → ESP32 GPIO 21</p><p><i class="yellow-dot"></i><b>SCL</b> → ESP32 GPIO 22</p></div></div><aside><b>重要安全提醒：</b>先確認擴充板電源軌輸出電壓及 LCD 背板規格。ESP32 的 GPIO 不耐 5V；若 LCD 使用 5V 且 SDA/SCL 被上拉到 5V，請加雙向 I2C 電平轉換器。</aside></section>
+    <section class="lesson-section wiring-visual"><p class="eyebrow">接線示意圖</p><h2>ESP32 擴充板接線位置</h2><p class="wide-text">DHT11 與 LCD 的 VCC、GND 共接擴充板旁的正負電源軌；三條訊號線接 ESP32 GPIO。</p>
+      <figure class="diagram-figure"><img class="wiring-diagram" src="images/dht11-lcd-wiring-user.png" alt="ESP32、DHT11 與 16×2 I2C LCD 接線示意圖" /><figcaption>ESP32 連接 DHT11 與 16×2 I2C LCD 示意圖；供電腳位請依編號接至擴充板電源軌。</figcaption></figure>
+      <template>
+        <svg class="wiring-diagram" viewBox="0 0 1000 560" role="img" aria-labelledby="diagramTitle diagramDesc">
+          <title id="diagramTitle">ESP32 擴充板、DHT11 和 I2C LCD 接線圖</title><desc id="diagramDesc">七條線：DHT11 電源接擴充板正負軌、資料接 GPIO4；LCD 電源接正負軌、SDA 接 GPIO21、SCL 接 GPIO22。</desc>
+          <rect x="18" y="18" width="964" height="524" rx="20" fill="#f8fbff" stroke="#dce5f1" stroke-width="2"/>
+          <!-- breadboard expansion board and power rails -->
+          <rect x="285" y="90" width="430" height="410" rx="20" fill="#e9eef5" stroke="#8795a9" stroke-width="4"/>
+          <rect x="300" y="108" width="27" height="365" rx="8" fill="#ee4c4c"/><text x="313" y="130" text-anchor="middle" class="svg-white">+</text>
+          <rect x="674" y="108" width="27" height="365" rx="8" fill="#3974d8"/><text x="687" y="130" text-anchor="middle" class="svg-white">−</text>
+          <text x="500" y="485" text-anchor="middle" class="svg-label">ESP32 擴充板</text>
+          <!-- ESP32 board -->
+          <rect x="405" y="132" width="190" height="330" rx="18" fill="#14233c" stroke="#0a1426" stroke-width="4"/>
+          <rect x="445" y="175" width="110" height="110" rx="8" fill="#a7afbc"/><text x="500" y="235" text-anchor="middle" class="svg-label">ESP32</text>
+          <text x="600" y="324" class="svg-small">GPIO 4</text><text x="600" y="359" class="svg-small">GPIO 21</text><text x="600" y="394" class="svg-small">GPIO 22</text>
+          <circle cx="585" cy="319" r="7" fill="#f7cb42"/><circle cx="585" cy="354" r="7" fill="#f7cb42"/><circle cx="585" cy="389" r="7" fill="#f7cb42"/>
+          <!-- DHT11 -->
+          <rect x="65" y="183" width="145" height="145" rx="18" fill="#20bfe9" stroke="#087da5" stroke-width="4"/><path d="M85 207h105M85 232h105M85 257h105M85 282h105M105 195v105M135 195v105M165 195v105" stroke="#087da5" stroke-width="12" stroke-dasharray="12 12"/>
+          <text x="137" y="166" text-anchor="middle" class="svg-label">DHT11 感應器</text><text x="82" y="355" class="svg-small">VCC</text><text x="130" y="355" class="svg-small">DATA</text><text x="177" y="355" class="svg-small">GND</text>
+          <!-- LCD with backpack pins -->
+          <rect x="790" y="185" width="155" height="155" rx="14" fill="#188755" stroke="#08643c" stroke-width="4"/><rect x="812" y="215" width="112" height="65" rx="7" fill="#183c9b"/><text x="868" y="252" text-anchor="middle" class="svg-white">16×2 LCD</text>
+          <text x="785" y="363" class="svg-small">GND</text><text x="833" y="363" class="svg-small">VCC</text><text x="880" y="363" class="svg-small">SDA</text><text x="925" y="363" class="svg-small">SCL</text>
+          <!-- seven numbered wires: DHT power rails and signal -->
+          <path d="M82 374 V430 H313 V400" class="wire red-wire"/><path d="M176 374 V451 H687 V400" class="wire blue-wire"/><path d="M130 374 V335 H585 V319" class="wire yellow-wire"/>
+          <!-- LCD power rails and signal -->
+          <path d="M795 382 V448 H687 V400" class="wire blue-wire"/><path d="M842 382 V462 H313 V400" class="wire red-wire"/><path d="M889 382 V354 H585" class="wire orange-wire"/><path d="M936 382 V389 H585" class="wire purple-wire"/>
+          <!-- wire number badges -->
+          <g class="wire-badge"><circle cx="270" cy="430" r="17"/><text x="270" y="436">1</text></g><g class="wire-badge"><circle cx="740" cy="451" r="17"/><text x="740" y="457">2</text></g><g class="wire-badge"><circle cx="355" cy="335" r="17"/><text x="355" y="341">3</text></g><g class="wire-badge"><circle cx="750" cy="448" r="17"/><text x="750" y="454">4</text></g><g class="wire-badge"><circle cx="270" cy="462" r="17"/><text x="270" y="468">5</text></g><g class="wire-badge"><circle cx="725" cy="354" r="17"/><text x="725" y="360">6</text></g><g class="wire-badge"><circle cx="725" cy="389" r="17"/><text x="725" y="395">7</text></g>
+          <text x="500" y="525" text-anchor="middle" class="svg-small">紅線：＋電源　藍線：−電源　黃色：GPIO 4　橘色：GPIO 21　紫色：GPIO 22</text>
+        </svg>
+        <figcaption>所有電源線接擴充板的電源軌；訊號線依標示接 GPIO。</figcaption>
+      </template>
+      <div class="wire-groups"><section class="wire-group"><h3>DHT11 溫溼度感應器</h3><ol class="wire-key"><li><b>1</b><span><strong>VCC</strong> → 擴充板電源軌 <em>3.3V</em></span></li><li><b>2</b><span><strong>GND</strong> → 擴充板電源軌 <em>GND</em></span></li><li><b>3</b><span><strong>DATA</strong> → ESP32 GPIO 4</span></li></ol></section><section class="wire-group"><h3>16×2 I2C LCD 背板</h3><ol class="wire-key"><li><b>4</b><span><strong>GND</strong> → 擴充板電源軌 <em>GND</em></span></li><li><b>5</b><span><strong>VCC</strong> → 擴充板電源軌 <em>3.3V</em></span></li><li><b>6</b><span><strong>SDA</strong> → ESP32 GPIO 21</span></li><li><b>7</b><span><strong>SCL</strong> → ESP32 GPIO 22</span></li></ol></section></div>
+    </section>
+    <section id="code" class="lesson-section"><p class="eyebrow">步驟 3・安裝函式庫與上傳</p><h2>完整 Arduino 程式</h2><p class="wide-text">請在 Arduino IDE 的「程式庫管理員」依序安裝以下三個函式庫：</p><ul class="library-list"><li><b>DHT sensor library</b><span>作者：Adafruit</span></li><li><b>Adafruit Unified Sensor</b><span>作者：Adafruit</span></li><li><b>hd44780</b><span>作者：Bill Perry</span></li></ul><p class="wide-text"><code>hd44780</code> 會自動偵測常見 I2C LCD 背板的位址與接腳配置。</p><div class="code-box"><button id="copyCode" type="button">複製程式碼</button><pre><code id="arduinoCode">#include &lt;Wire.h&gt;
+#include &lt;DHT.h&gt;
+#include &lt;hd44780.h&gt;
+#include &lt;hd44780ioClass/hd44780_I2Cexp.h&gt;
+
+// DHT11 設定
+#define DHTPIN 4
+#define DHTTYPE DHT11
+DHT dht(DHTPIN, DHTTYPE);
+
+// 自動偵測 I2C LCD 的位址與背板接腳配置
+hd44780_I2Cexp lcd;
+
+void setup() {
+  Serial.begin(115200);
+  dht.begin();
+
+  // ESP32 I2C：SDA = GPIO 21，SCL = GPIO 22
+  Wire.begin(21, 22); // SDA = GPIO 21，SCL = GPIO 22
+
+  int lcdStatus = lcd.begin(16, 2);
+  if (lcdStatus) {
+    Serial.print("LCD init failed, code: ");
+    Serial.println(lcdStatus);
+    while (true) {
+      delay(1000); // LCD 初始化失敗時停止程式
+    }
+  }
+
+  lcd.backlight();
+
+  lcd.setCursor(0, 0);
+  lcd.print("DHT11 Monitor");
+  lcd.setCursor(0, 1);
+  lcd.print("Starting...");
+  delay(1500);
+  lcd.clear();
+}
+
+void loop() {
+  float humidity = dht.readHumidity();
+  float temperature = dht.readTemperature();
+
+  if (isnan(humidity) || isnan(temperature)) {
+    lcd.clear();
+    lcd.setCursor(0, 0);
+    lcd.print("Sensor Error");
+    lcd.setCursor(0, 1);
+    lcd.print("Check DHT11");
+    Serial.println("DHT11 read failed");
+    delay(2000);
+    return;
+  }
+
+  Serial.print("Temperature: ");
+  Serial.print(temperature, 1);
+  Serial.print(" C  Humidity: ");
+  Serial.print(humidity, 1);
+  Serial.println(" %");
+
+  lcd.setCursor(0, 0);
+  lcd.print("Temp: ");
+  lcd.print(temperature, 1);
+  lcd.print((char)223);  // 度數符號
+  lcd.print("C   ");
+
+  lcd.setCursor(0, 1);
+  lcd.print("Humi: ");
+  lcd.print(humidity, 1);
+  lcd.print("%    ");
+
+  delay(2000); // DHT11 最少每 2 秒讀取一次
+}</code></pre></div></section>
+    <section class="lesson-section troubleshoot"><p class="eyebrow">步驟 4・故障排查</p><h2>常見狀況這樣處理</h2><details open><summary>LCD 初始化失敗或無法顯示</summary><p>先調整 LCD 背面的藍色可變電阻（對比）。接著在 Arduino IDE 開啟：<code>File → Examples → hd44780 → ioClass → hd44780_I2Cexp → I2CexpDiag</code>，上傳診斷程式檢查 I2C 接線、位址與 LCD 背板。</p></details><details><summary>LCD 發熱或完全不亮</summary><p>立刻斷電。優先檢查 VCC、GND 是否接反或短路。這通常不是程式問題；若重新接線仍快速發熱，LCD 可能已損壞。</p></details><details><summary>序列埠出現 DHT11 read failed</summary><p>確認 DATA 接 GPIO 4、VCC 接 3V3、GND 共地。若是裸 DHT11 而非模組，DATA 與 VCC 之間需加約 10kΩ 上拉電阻。</p></details><div class="page-bottom-action"><a class="primary-button" href="index.html">回到首頁</a></div></section>
+  </main>
+  <div id="toast" role="status" aria-live="polite"></div>
+  <footer>ESP32 專題實驗室・每完成一個小作品，就多一項能力</footer>
+  <script src="dht11-lcd.js"></script>
+</body>
+</html>
+
